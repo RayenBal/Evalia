@@ -1,0 +1,330 @@
+.quiz-details-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+  padding: 40px 20px;
+}
+
+.quiz-details-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Page Title - Modern Style
+   ======================================== */
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 35px;
+  text-align: left;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(21, 101, 192, 0.1);
+}
+
+/* ========================================
+   Quiz Title Card
+   ======================================== */
+
+.quiz-title-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(66, 165, 245, 0.15);
+  border: 1px solid rgba(66, 165, 245, 0.1);
+  animation: slideIn 0.4s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quiz-title-card:hover {
+  box-shadow: 0 8px 30px rgba(66, 165, 245, 0.2);
+  transform: translateY(-2px);
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 12px;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quiz-content {
+  font-size: 20px;
+  color: #1565c0;
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* ========================================
+   Questions Section
+   ======================================== */
+
+.questions-section {
+  margin-bottom: 30px;
+}
+
+.questions-heading {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* ========================================
+   Question Card
+   ======================================== */
+
+.question-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(66, 165, 245, 0.12);
+  border: 1px solid rgba(66, 165, 245, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideIn 0.4s ease-out;
+}
+
+.question-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(66, 165, 245, 0.2);
+  border-color: rgba(66, 165, 245, 0.2);
+}
+
+/* Question Header */
+.question-header {
+  margin-bottom: 18px;
+}
+
+.question-number {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  padding: 8px 18px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* Question Content */
+.question-content {
+  font-size: 18px;
+  color: #1565c0;
+  font-weight: 500;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+/* ========================================
+   Responses Section
+   ======================================== */
+
+.responses-section {
+  margin-top: 15px;
+}
+
+.responses-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #546e7a;
+  margin-bottom: 12px;
+}
+
+.responses-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.response-item {
+  background: linear-gradient(135deg, #f5f9ff 0%, #e3f2fd 100%);
+  border-left: 4px solid #64b5f6;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1565c0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(66, 165, 245, 0.08);
+}
+
+.response-item:hover {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left-color: #1e88e5;
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(66, 165, 245, 0.2);
+}
+
+/* ========================================
+   No Content States
+   ======================================== */
+
+.no-questions-card {
+  background: #fff3cd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.no-questions-text {
+  color: #856404;
+  font-size: 15px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.no-responses {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.no-responses-text {
+  color: #757575;
+  font-size: 14px;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ========================================
+   Back Button
+   ======================================== */
+
+.btn-back {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 10px;
+  box-shadow: 0 4px 16px rgba(66, 165, 245, 0.3);
+  letter-spacing: 0.3px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(66, 165, 245, 0.4);
+}
+
+/* ========================================
+   Loading State
+   ======================================== */
+
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(79, 195, 247, 0.2);
+  border-top-color: #4fc3f7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #546e7a;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .quiz-details-container {
+    padding: 20px 15px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .quiz-title-card {
+    padding: 20px;
+  }
+
+  .quiz-content {
+    font-size: 16px;
+  }
+
+  .question-card {
+    padding: 20px;
+  }
+
+  .question-content {
+    font-size: 16px;
+  }
+
+  .response-item {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .btn-back {
+    width: 100%;
+  }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+  .quiz-details-container {
+    background: white;
+    padding: 20px;
+  }
+
+  .btn-back {
+    display: none;
+  }
+
+  .question-card,
+  .quiz-title-card {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    page-break-inside: avoid;
+  }
+}

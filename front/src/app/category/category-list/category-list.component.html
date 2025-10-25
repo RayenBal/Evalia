@@ -1,0 +1,82 @@
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <!-- Logo -->
+    <a routerLink="/" style="text-decoration: none;">
+      <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+    </a>
+
+    <!-- Navigation -->
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <li>
+        <a routerLink="/" class="nav-link-modern">
+          <i class="bi bi-house-door" style="margin-right: 0.5rem;"></i> Home
+        </a>
+      </li>
+      <li>
+        <a routerLink="/CategoryList" class="nav-link-modern">
+          <i class="bi bi-folder2-open" style="margin-right: 0.5rem;"></i> Catégories
+        </a>
+      </li>
+      <li>
+        <a routerLink="/announcements" class="nav-link-modern">
+          <i class="bi bi-megaphone" style="margin-right: 0.5rem;"></i> Annonces
+        </a>
+      </li>
+    </ul>
+
+    <!-- Boutons d'authentification -->
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/login" class="btn-modern btn-outline-pastel">
+        Sign in
+      </a>
+      <a href="/register" class="btn-modern btn-primary-pastel">
+        Sign up
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+
+
+<div class="container-modern" style="padding: 3rem 1rem; min-height: 100vh;">
+  
+  <!-- En-tête avec animation -->
+  <div class="header-section animate-fade-in" style="text-align: center; margin-bottom: 3rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">
+      <i class="bi bi-tags icon-lg" style="margin-right: 1rem;"></i>
+      Catégories
+    </h1>
+    <p style="color: #6B7280; font-size: 1.125rem;">
+      Explorez nos catégories et découvrez les annonces
+    </p>
+    <div class="divider-pastel"></div>
+  </div>
+
+  <!-- Message si la liste est vide -->
+  <div *ngIf="categoryList.length === 0" class="animate-scale-in" style="text-align: center; padding: 3rem;">
+    <i class="bi bi-inbox icon-xl" style="color: var(--pastel-blue-400); display: block; margin-bottom: 1rem;"></i>
+    <p style="color: #9CA3AF; font-size: 1.125rem;">Aucune catégorie trouvée.</p>
+  </div>
+
+  <!-- Grille des catégories -->
+  <div *ngIf="categoryList.length > 0" class="grid-modern" style="gap: 2rem;">
+    <a
+      *ngFor="let category of categoryList; let i = index"
+      [routerLink]="['/categories', category.idcategory]"
+      class="card-modern animate-scale-in"
+      [style.animation-delay]="(i * 0.1) + 's'"
+      style="text-decoration: none; cursor: pointer; transition: all 0.3s ease; padding: 2rem;"
+    >
+      <div style="text-align: center;">
+        <i class="bi bi-folder2-open icon-xl icon-circle-lg" style="color: var(--pastel-blue-600); margin-bottom: 1.5rem;"></i>
+        <h3 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+          {{ category.nameCategory }}
+        </h3>
+        <p style="color: #6B7280; font-size: 0.875rem; margin: 0;">
+          Voir toutes les annonces
+        </p>
+      </div>
+    </a>
+  </div>
+</div>

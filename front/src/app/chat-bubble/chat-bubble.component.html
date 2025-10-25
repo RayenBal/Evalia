@@ -1,0 +1,265 @@
+<div class="chat-container" [class.dragging]="isDragging">
+  <!-- File Input (Hidden) - MOVED OUTSIDE CHAT WINDOW -->
+  <input 
+    type="file" 
+    #fileInput
+    (change)="onFileSelected($event)"
+    style="display: none" 
+    accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.csv"
+  />
+
+  <!-- Premium Floating Action Button -->
+  <button class="chat-toggle" (click)="toggleChat()" [class.active]="isOpen">
+    <div class="toggle-inner">
+      <svg class="chat-icon" width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+      </svg>
+      <svg class="close-icon" width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </div>
+    <div class="pulse-ring"></div>
+    <div class="notification-badge" *ngIf="messages.length > 1">!</div>
+  </button>
+
+  <!-- Premium Chat Window -->
+  <div class="chat-window" *ngIf="isOpen" [class.slide-in]="isOpen">
+    <!-- Sophisticated Header -->
+    <div class="chat-header">
+      <div class="header-gradient">
+        <div class="header-content">
+          <div class="ai-branding">
+            <div class="ai-logo">
+              <div class="logo-glow"></div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                  <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#764ba2"/>
+                  </linearGradient>
+                </defs>
+                <path fill="url(#headerGradient)" d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 3.5C14.8 3.4 14.6 3.4 14.4 3.5L8.4 6.8C8.2 6.9 8 7.2 8 7.4V9C8 9.6 8.4 10 9 10H20C20.6 10 21 9.6 21 9ZM3 12C2.4 12 2 12.4 2 13V20C2 20.6 2.4 21 3 21H10C10.6 21 11 20.6 11 20V13C11 12.4 10.6 12 10 12H3ZM21 13V20C21 20.6 20.6 21 20 21H13V13H21Z"/>
+              </svg>
+            </div>
+            <div class="header-text">
+              <div class="company-name">Evalia AI</div>
+              <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">En ligne • IA avancée</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <div class="quick-actions">
+            <button class="header-btn" (click)="quickAction('clear')" title="Nouvelle conversation">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12z"/>
+              </svg>
+            </button>
+            <button class="header-btn" (click)="quickAction('export')" title="Exporter la conversation">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-2 17l-4-4h3V9h2v6h3l-4 4z"/>
+              </svg>
+            </button>
+          </div>
+          <button class="close-btn" (click)="toggleChat()" title="Fermer (Ctrl+K)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Messages Area -->
+    <div class="chat-messages" #messagesContainer>
+      <!-- Premium Welcome Message -->
+<div class="message assistant welcome-message">
+  <div class="message-avatar">
+    <div class="avatar-glow"></div>
+    <span>AI</span>
+  </div>
+  <div class="message-content">
+    <div class="message-bubble">
+      <div class="message-header">
+        <strong>Evalia AI</strong>
+        <span class="message-time">{{ getCurrentTime() }}</span>
+      </div>
+      <div class="message-text">
+        <p><strong>👋 Bonjour ! Je suis l'assistant Evalia AI</strong></p>
+        <p>Je suis dédié à Evalia, une plateforme de gestion d'annonces, de tests utilisateurs et de récompenses.</p>
+        
+        <div class="capabilities">
+          <div class="capability-item">
+            <span class="capability-icon">📢</span>
+            <span>Création et modification d'annonces</span>
+          </div>
+          <div class="capability-item">
+            <span class="capability-icon">📝</span>
+            <span>Gestion des quiz et tests utilisateurs</span>
+          </div>
+          <div class="capability-item">
+            <span class="capability-icon">👥</span>
+            <span>Gestion des rôles (Annonceur, Panéliste, Admin)</span>
+          </div>
+          <div class="capability-item">
+            <span class="capability-icon">🎁</span>
+            <span>Récompenses et système de feedback</span>
+          </div>
+        </div>
+        
+        <div class="suggestions">
+          <span class="suggestion-tag" (click)="onSuggestionClick('Comment créer une annonce ?')">📢 Créer une annonce</span>
+          <span class="suggestion-tag" (click)="onSuggestionClick('Comment fonctionnent les quiz ?')">📝 Quiz et tests</span>
+          <span class="suggestion-tag" (click)="onSuggestionClick('Quels sont les différents rôles ?')">👥 Rôles utilisateurs</span>
+          <span class="suggestion-tag" (click)="onSuggestionClick('Comment gérer les récompenses ?')">🎁 Système de récompenses</span>
+        </div>
+        
+        <p class="disclaimer-text"><small>Pour des questions hors de ce périmètre, je te conseille de consulter des ressources spécialisées.</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- Chat Messages -->
+      <div *ngFor="let msg of messages; let i = index" class="message" [ngClass]="msg.role">
+        <div class="message-avatar" *ngIf="msg.role === 'assistant'">
+          <div class="avatar-glow"></div>
+          <span>AI</span>
+        </div>
+        
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-header" *ngIf="msg.role === 'assistant'">
+              <strong>Evalia AI</strong>
+              <span class="message-time">{{ msg.timestamp }}</span>
+            </div>
+            
+            <!-- Attachments -->
+            <div class="attachments" *ngIf="msg.attachments && msg.attachments.length > 0">
+              <div *ngFor="let attachment of msg.attachments" class="attachment-item">
+                <div class="attachment-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+                  </svg>
+                </div>
+                <span class="attachment-name">{{ attachment.name }}</span>
+                <button class="attachment-download" (click)="downloadAttachment(attachment)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="message-text">{{ msg.content }}</div>
+          </div>
+        </div>
+        
+        <div class="message-avatar user-avatar" *ngIf="msg.role === 'user'">
+          <span>VOUS</span>
+        </div>
+      </div>
+
+      <!-- Advanced Loading Indicator -->
+      <div *ngIf="loading" class="message assistant">
+        <div class="message-avatar">
+          <div class="avatar-glow"></div>
+          <span>AI</span>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble loading-bubble">
+            <div class="thinking-indicator">
+              <div class="thinking-text">Evalia analyse votre demande</div>
+              <div class="neuro-dots">
+                <div class="neuro-dot"></div>
+                <div class="neuro-dot"></div>
+                <div class="neuro-dot"></div>
+                <div class="neuro-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Input Area -->
+    <div class="chat-input">
+      <!-- Selected File Preview -->
+      <div class="file-preview" *ngIf="selectedFile">
+        <div class="file-preview-content">
+          <div class="file-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+            </svg>
+          </div>
+          <div class="file-info">
+            <div class="file-name">{{ selectedFile.name }}</div>
+            <div class="file-size">{{ getFileSize(selectedFile.size) }}</div>
+          </div>
+          <button class="file-remove" (click)="removeAttachment()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="input-container" [class.recording]="isRecording">
+        <div class="input-actions">
+          <button 
+            class="input-action-btn" 
+            (click)="triggerFileInput()"
+            title="Importer un fichier (Glissez-déposez aussi)"
+            [class.active]="selectedFile"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+          </button>
+          <button 
+            class="input-action-btn voice-btn" 
+            (click)="toggleRecording()"
+            [class.recording]="isRecording"
+            title="Enregistrement vocal"
+          >
+            <svg *ngIf="!isRecording" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+            </svg>
+            <div *ngIf="isRecording" class="recording-pulse"></div>
+          </button>
+        </div>
+        
+        <textarea 
+          [(ngModel)]="userInput"
+          (keydown.enter)="onTextareaEnter($event)"
+          placeholder="Message Evalia AI... (Ctrl+K pour ouvrir/fermer)"
+          class="message-input"
+          rows="1"
+          #messageTextarea
+        ></textarea>
+        
+        <button 
+          class="send-btn" 
+          (click)="sendMessage()" 
+          [disabled]="!userInput.trim() && !selectedFile"
+          [class.enabled]="userInput.trim() || selectedFile"
+          title="Envoyer le message"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="input-footer">
+        <span class="disclaimer">
+          💡 Glissez-déposez des fichiers, enregistrez votre voix ou tapez votre message
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

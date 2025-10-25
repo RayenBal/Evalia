@@ -1,0 +1,341 @@
+
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+       <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+
+<!-- FORMULAIRE DE CRÉATION -->
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem;">
+  <div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+      <i class="bi bi-plus-circle icon-lg" style="margin-right: 0.5rem;"></i> Créer une nouvelle annonce
+    </h1>
+    <p style="color: #757575; font-size: 1.1rem;">Remplissez le formulaire pour créer votre annonce</p>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <form *ngIf="announcementForm" [formGroup]="announcementForm" (ngSubmit)="onSubmit()">
+    
+    <!-- INFORMATIONS PRINCIPALES -->
+    <div class="card-modern animate-scale-in" style="margin-bottom: 2rem;">
+      <h3 style="color: #256F86; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-clipboard-data icon-md icon-blue"></i> Informations principales
+      </h3>
+
+      <!-- Nom de l'annonce -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+          Nom de l'annonce <span style="color: #FFCCCB;">*</span>
+        </label>
+        <input type="text" 
+               class="input-modern" 
+               formControlName="announceName"
+               placeholder="Ex: Test de nouveau produit cosmétique">
+        <small class="text-danger" 
+               *ngIf="announcementForm.get('announceName')?.touched && announcementForm.get('announceName')?.invalid"
+               style="display: block; margin-top: 0.5rem;">
+          ⚠️ Le nom est obligatoire
+        </small>
+      </div>
+
+      <!-- Catégorie -->
+      <div formGroupName="category" style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+          Catégorie <span style="color: #FFCCCB;">*</span>
+        </label>
+        <select class="input-modern" formControlName="idcategory" style="cursor: pointer;">
+          <option [ngValue]="null" disabled>-- Choisir une catégorie --</option>
+          <option *ngFor="let c of categories" [value]="c.idcategory">{{ c.nameCategory }}</option>
+        </select>
+        <small class="text-danger" 
+               *ngIf="announcementForm.get('category.idcategory')?.touched && announcementForm.get('category.idcategory')?.invalid"
+               style="display: block; margin-top: 0.5rem;">
+          ⚠️ La catégorie est obligatoire
+        </small>
+      </div>
+
+      <!-- Modes de test -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.75rem;">
+          🎯 Modes de test
+        </label>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #E8F4F8; border-radius: 0.5rem; cursor: pointer; transition: all 200ms;">
+            <input type="checkbox" [value]="'HOME_DELIVERY'" (change)="onTestModeChange($event)" style="width: 18px; height: 18px; cursor: pointer;">
+            <span style="font-weight: 500; color: #424242;">🏠 Livraison à domicile</span>
+          </label>
+          
+          <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #E8F4F8; border-radius: 0.5rem; cursor: pointer; transition: all 200ms;">
+            <input type="checkbox" [value]="'OFFICE_TESTING'" (change)="onTestModeChange($event)" style="width: 18px; height: 18px; cursor: pointer;">
+            <span style="font-weight: 500; color: #424242;">🏢 Test en bureau</span>
+          </label>
+        </div>
+
+        <!-- Adresse du bureau (si sélectionné) -->
+        <div *ngIf="isOfficeTestingSelected" class="animate-fade-in" style="margin-top: 1rem; padding: 1rem; background: #D5F5E3; border-radius: 0.5rem;">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            📍 Adresse du bureau
+          </label>
+          <input type="text" 
+                 class="input-modern" 
+                 formControlName="officeAddress" 
+                 placeholder="Entrez l'adresse du bureau">
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+          Contenu / Description
+        </label>
+        <textarea class="input-modern" 
+                  formControlName="content" 
+                  rows="4"
+                  placeholder="Décrivez votre annonce en détail..."
+                  style="resize: vertical;"></textarea>
+      </div>
+
+      <!-- Images -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.75rem;">
+          🖼️ Image principale
+        </label>
+        <div class="file-upload-modern">
+          <input type="file" 
+                 id="mainImage"
+                 (change)="onMainImageSelected($event)"
+                 accept="image/*">
+          <div class="file-upload-border" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border: 2px dashed #A3D3E3; border-radius: 0.75rem; background: linear-gradient(135deg, #E8F4F8 0%, #D1E9F1 100%); transition: all 300ms;">
+            <div class="icon-circle">
+              <i class="bi bi-image icon-lg icon-blue"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #256F86; margin-bottom: 0.25rem;">Choisir une image</div>
+              <small style="color: #757575;" id="mainImageLabel">Aucune image choisie</small>
+            </div>
+            <div class="btn-modern btn-primary-pastel" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; pointer-events: none;">
+              Parcourir
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.75rem;">
+          📸 Images produit (plusieurs)
+        </label>
+        <div class="file-upload-modern">
+          <input type="file" 
+                 id="productImages"
+                 multiple 
+                 (change)="onProductImagesSelected($event)"
+                 accept="image/*">
+          <div class="file-upload-border" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border: 2px dashed #75BDD5; border-radius: 0.75rem; background: linear-gradient(135deg, #D5F5E3 0%, #D1E9F1 100%); transition: all 300ms;">
+            <div class="icon-circle">
+              <i class="bi bi-images icon-lg" style="color: #B8ECD0;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #256F86; margin-bottom: 0.25rem;">Sélectionner fichiers</div>
+              <small style="color: #757575;" id="productImagesLabel">Aucun fichier choisi</small>
+            </div>
+            <div class="btn-modern btn-success-pastel" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; pointer-events: none;">
+              Parcourir
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div formArrayName="quizList" class="card-modern animate-scale-in delay-100" style="margin-bottom: 2rem;">
+      <h3 style="color: #256F86; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-question-circle icon-md icon-blue"></i> Quiz
+      </h3>
+
+      <div *ngFor="let quiz of quizList.controls; let qi = index" 
+           [formGroupName]="qi"
+           class="animate-slide-right"
+           [style.animation-delay]="(qi * 100) + 'ms'"
+           style="padding: 1.5rem; background: linear-gradient(135deg, #D5F5E3 0%, #D1E9F1 100%); border-radius: 0.75rem; margin-bottom: 1.5rem; border-left: 4px solid #47A7C7;">
+        
+        <h5 style="color: #256F86; font-weight: 700; margin-bottom: 1rem;">Quiz {{ qi + 1 }}</h5>
+        
+        <input formControlName="content" 
+               placeholder="Titre du quiz" 
+               class="input-modern"
+               style="margin-bottom: 1rem;"/>
+
+        <!-- Questions -->
+        <div formArrayName="questions">
+          <div *ngFor="let question of getQuestions(qi).controls; let qj = index" 
+               [formGroupName]="qj"
+               style="padding: 1rem; background: white; border-radius: 0.5rem; margin-bottom: 1rem;">
+            
+            <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+              Question {{ qj + 1 }}
+            </label>
+            <input formControlName="content" 
+                   placeholder="Contenu de la question" 
+                   class="input-modern"
+                   style="margin-bottom: 0.75rem;"/>
+
+            <!-- Réponses -->
+            <div formArrayName="responses" style="margin-left: 1rem;">
+              <div *ngFor="let response of getResponses(qi, qj).controls; let rk = index" 
+                   [formGroupName]="rk"
+                   style="margin-bottom: 0.5rem;">
+                <input formControlName="content" 
+                       placeholder="Réponse {{ rk + 1 }}" 
+                       class="input-modern"/>
+              </div>
+              <button type="button" 
+                      (click)="addResponse(qi, qj)" 
+                      class="btn-modern btn-success-pastel"
+                      style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-top: 0.5rem;">
+                + Réponse
+              </button>
+            </div>
+            
+            <button type="button" 
+                    (click)="removeQuestion(qi, qj)" 
+                    class="btn-modern btn-danger-pastel"
+                    style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-top: 0.75rem;">
+                    <i class="bi bi-trash icon-sm"></i> Supprimer question
+            </button>
+          </div>
+          
+          <button type="button" 
+                  (click)="addQuestion(qi)" 
+                  class="btn-modern btn-primary-pastel"
+                  style="margin-top: 0.75rem;">
+            + Question
+          </button>
+        </div>
+
+        <button type="button" 
+                (click)="removeQuiz(qi)" 
+                class="btn-modern btn-danger-pastel"
+                style="margin-top: 1rem;">
+          <i class="bi bi-trash icon-sm"></i> Supprimer Quiz
+        </button>
+      </div>
+
+      <button type="button" 
+              (click)="addQuiz()" 
+              class="btn-modern btn-primary-pastel">
+        <i class="bi bi-plus-lg icon-sm"></i> Ajouter un quiz
+      </button>
+    </div>
+
+    <!-- RÉCOMPENSES -->
+    <div class="card-modern animate-scale-in delay-200" style="margin-bottom: 2rem;">
+      <h3 style="color: #256F86; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-gift icon-md icon-pink"></i> Récompenses
+      </h3>
+
+      <div formArrayName="recompensesList">
+        <div *ngFor="let r of rewards.controls; let i = index" 
+             [formGroupName]="i"
+             style="padding: 1rem; background: #E6E6FA; border-radius: 0.75rem; margin-bottom: 1rem; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+          
+          <div>
+            <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem; font-size: 0.9rem;">Type</label>
+            <select formControlName="typeRecompenses" class="input-modern">
+              <option [ngValue]="null">-- Type --</option>
+              <option *ngFor="let t of typeRecompenseOptions" [ngValue]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem; font-size: 0.9rem;">Montant / points</label>
+            <input type="number" formControlName="amount" class="input-modern" placeholder="0"/>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem; font-size: 0.9rem;">Label (optionnel)</label>
+            <input type="text" formControlName="label" class="input-modern" placeholder="Ex: Cadeau"/>
+          </div>
+
+          <button type="button" 
+                  (click)="removeRewardRow(i)" 
+                  class="btn-modern btn-danger-pastel"
+                  style="padding: 0.75rem; font-size: 0.85rem;">
+            <i class="bi bi-trash icon-sm"></i>
+          </button>
+        </div>
+
+        <button type="button" 
+                (click)="addRewardRow()" 
+                class="btn-modern btn-success-pastel">
+          <i class="bi bi-plus-lg icon-sm"></i> Ajouter une récompense
+        </button>
+      </div>
+    </div>
+
+    <!-- BOUTON DE SOUMISSION -->
+    <div class="animate-fade-in delay-300" style="text-align: center; padding-top: 1rem;">
+      <button class="btn-modern btn-primary-pastel" 
+              type="submit"
+              style="font-size: 1.1rem; padding: 1rem 3rem;">
+        <i class="bi bi-check-circle icon-md"></i> Créer Annonce + Quiz
+      </button>
+      
+      <!-- Message de debug -->
+      <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 8px; font-size: 0.875rem;">
+ 
+        
+        <!-- Afficher les champs invalides -->
+        <div *ngIf="announcementForm.invalid" style="margin-top: 1rem; padding: 1rem; background: #FEE2E2; border-radius: 8px; color: #DC2626;">
+          <strong>⚠️ Champs manquants ou invalides :</strong>
+          <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+            <li *ngIf="announcementForm.get('announceName')?.invalid">
+              ❌ Nom de l'annonce (requis)
+            </li>
+            <li *ngIf="announcementForm.get('content')?.invalid">
+              ❌ Description (requise)
+            </li>
+            <li *ngIf="announcementForm.get('category.idcategory')?.invalid">
+              ❌ Catégorie (requise)
+            </li>
+            <li *ngIf="announcementForm.get('testModes')?.value?.length === 0">
+              ❌ Mode de test (cochez au moins une option)
+            </li>
+            <li *ngIf="rewards.invalid">
+              ❌ Récompenses (vérifiez les montants)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

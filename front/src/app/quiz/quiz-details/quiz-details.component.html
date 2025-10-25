@@ -1,0 +1,146 @@
+<ng-container *ngIf="isAnnonceur; else panelisteNavbar">
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+      </li>
+            <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announces" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<ng-template #panelisteNavbar>
+  <!-- NAVBAR Paneliste -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+
+
+
+<div class="quiz-details-container" *ngIf="quiz; else loadingTpl">
+  <div class="quiz-details-wrapper">
+    <!-- Page Title -->
+    <h2 class="page-title">Détails du Quiz</h2>
+
+    <!-- Quiz Title Section -->
+    <div class="quiz-title-card">
+      <h5 class="section-label">Titre du Quiz</h5>
+      <p class="quiz-content">{{ quiz.content }}</p>
+    </div>
+
+    <!-- Questions Section -->
+    <div class="questions-section">
+      <h3 class="questions-heading">Questions</h3>
+
+      <div *ngIf="quiz.questions && quiz.questions.length > 0; else noQuestions">
+        <div
+          class="question-card"
+          *ngFor="let question of quiz.questions; let i = index"
+        >
+          <!-- Question Header -->
+          <div class="question-header">
+            <span class="question-number">Question {{ i + 1 }}</span>
+          </div>
+
+          <!-- Question Content -->
+          <p class="question-content">{{ question.content }}</p>
+
+          <!-- Responses -->
+          <div class="responses-section" *ngIf="question.responses && question.responses.length > 0">
+            <p class="responses-label">Réponses :</p>
+            <ul class="responses-list">
+              <li
+                class="response-item"
+                *ngFor="let response of question.responses"
+              >
+                {{ response.content }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- No Responses -->
+          <div class="no-responses" *ngIf="!question.responses || question.responses.length === 0">
+            <p class="no-responses-text">Aucune réponse disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Questions Template -->
+      <ng-template #noQuestions>
+        <div class="no-questions-card">
+          <p class="no-questions-text">Aucune question disponible pour ce quiz.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Back Button -->
+    <button type="button" class="btn-modern btn-outline-pastel" (click)="goBack()">
+        <i class="bi bi-arrow-left icon-sm"></i> Retour
+      </button>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTpl>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement du quiz...</p>
+  </div>
+</ng-template>

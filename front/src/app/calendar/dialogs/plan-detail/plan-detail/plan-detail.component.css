@@ -1,0 +1,17 @@
+
+
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+
+/* Styling for the entire modal */
+.viewContainer {
+    width: 600px; /* Adjust the width */
+    max-height: 80vh; /* Prevent overflow */
+    overflow-y: auto;
+    background: white;
+    padding: 20px;
+  }
+  

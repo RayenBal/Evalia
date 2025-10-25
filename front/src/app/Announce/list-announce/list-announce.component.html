@@ -1,0 +1,255 @@
+<!-- ==== NAVBAR ==== -->
+<!-- Si connecté -->
+<ng-container *ngIf="auth.isAuthenticated(); else publicNavbar">
+
+  <!-- Si connecté & annonceur -->
+  
+    <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+        
+      </li>
+            <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li *ngIf="selectedId"><a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+  <!-- NAVBAR Paneliste -->
+  <ng-template #panelisteNavbar>
+    <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+      <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+        <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+          <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+        </a>
+
+        <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+          <li style="position: relative;">
+            <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+              <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+              <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+                5
+              </span>
+            </a>
+          </li>
+          <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+          <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+          <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+          <li *ngIf="auth.isAuthenticated() && auth.isPaneliste">
+            <a routerLink="/me/rewards" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a>
+          </li>
+        </ul>
+
+        <button class="btn-modern btn-danger-pastel" (click)="logout()">
+          <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+        </button>
+      </div>
+    </nav>
+  </ng-template>
+
+</ng-container>
+
+<!-- Si NON connecté -->
+<ng-template #publicNavbar>
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <!-- Logo -->
+      <a routerLink="/" style="text-decoration: none;">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+      <!-- Navigation -->
+      <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+        <li>
+          <a routerLink="/" class="nav-link-modern">
+            <i class="bi bi-house-door" style="margin-right: 0.5rem;"></i> Home
+          </a>
+        </li>
+        <li>
+          <a routerLink="/CategoryList" class="nav-link-modern">
+            <i class="bi bi-folder2-open" style="margin-right: 0.5rem;"></i> Catégories
+          </a>
+        </li>
+        <li>
+          <a routerLink="/announcements" class="nav-link-modern">
+            <i class="bi bi-megaphone" style="margin-right: 0.5rem;"></i> Annonces
+          </a>
+        </li>
+      </ul>
+
+      <!-- Boutons d'authentification -->
+      <div style="display: flex; gap: 0.75rem;">
+        <a routerLink="/login" class="btn-modern btn-outline-pastel">Sign in</a>
+        <a routerLink="/register" class="btn-modern btn-primary-pastel">Sign up</a>
+      </div>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+
+
+<div class="carousel-container">
+  <!-- En-tête avec animation -->
+  <div class="header-section">
+    <h1 class="title-gradient">
+      Liste des Annonces
+    </h1>
+    <p class="subtitle">Découvrez toutes les annonces disponibles - Glissez pour naviguer</p>
+    <div class="counter">{{ currentIndex + 1 }} / {{ announces.length }}</div>
+  </div>
+
+  <!-- Carrousel fluide avec swipe -->
+  <div class="carousel-wrapper" *ngIf="announces && announces.length > 0">
+    
+    <!-- Bouton Navigation Gauche -->
+    <button class="nav-btn nav-btn-left" (click)="previousAnnounce()">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!-- Contenu du carrousel avec drag/swipe -->
+    <div class="carousel-track" 
+         [class.dragging]="isDragging"
+         (mousedown)="onDragStart($event)"
+         (mousemove)="onDragMove($event)"
+         (mouseup)="onDragEnd()"
+         (mouseleave)="onDragEnd()"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd()">
+      
+      <div class="carousel-slides-container"
+           [style.transform]="getTransform()"
+           [class.dragging]="isDragging">
+        
+        <div class="carousel-slide" 
+             *ngFor="let ann of announces; let i = index">
+          
+          <div class="announce-card">
+            <!-- En-tête de la carte -->
+            <div class="card-header">
+              <h2 class="announce-title">{{ ann.announceName }}</h2>
+              <p class="announce-content">{{ ann.content }}</p>
+            </div>
+
+            <!-- Image principale -->
+            <div class="main-image-wrapper" *ngIf="ann.image">
+              <img [src]="getImageUrl(ann.image)" 
+                   alt="Image principale" 
+                   class="main-image" />
+            </div>
+
+            <!-- Images produit -->
+            <div class="product-images" *ngIf="ann.productImages">
+              <h6 class="section-title">
+                <i class="bi bi-images"></i> Images du produit
+              </h6>
+              <div class="images-grid">
+                <img *ngFor="let img of ann.productImages.split(',')" 
+                     [src]="getImageUrl(img)" 
+                     class="product-img" />
+              </div>
+            </div>
+
+            <!-- Modes de test -->
+            <div class="test-modes" *ngIf="ann.testModes?.length">
+              <div class="section-title">
+                <i class="bi bi-bullseye"></i> Modes de test
+              </div>
+              <div class="badges-container">
+                <span *ngFor="let mode of ann.testModes; let idx = index" 
+                      class="badge"
+                      [style.animation-delay]="(idx * 50) + 'ms'">
+                  {{ mode }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Adresse du bureau -->
+            <div class="office-address" *ngIf="ann.officeAddress">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ ann.officeAddress }}</span>
+            </div>
+
+            <!-- Quiz associés -->
+            <div class="quiz-section" *ngIf="ann.quizList?.length">
+              <h5 class="quiz-title">
+                <i class="bi bi-question-circle"></i> Quiz associés
+              </h5>
+              <div *ngFor="let quiz of ann.quizList" class="quiz-item">
+                <p class="quiz-content">{{ quiz.content }}</p>
+                <ul class="questions-list">
+                  <li *ngFor="let question of quiz.questions" class="question-item">
+                    {{ question.content }}
+                    <ul class="responses-list">
+                      <li *ngFor="let rep of question.responses">
+                        {{ rep.content }}
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Boutons d'action avec menu flottant -->
+            
+              
+              
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton Navigation Droite -->
+    <button class="nav-btn nav-btn-right" (click)="nextAnnounce()">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Indicateurs de navigation (dots) -->
+  <div class="carousel-indicators" *ngIf="announces && announces.length > 0">
+    <button *ngFor="let ann of announces; let i = index"
+            class="indicator-dot"
+            [class.active]="i === currentIndex"
+            (click)="goToSlide(i)">
+    </button>
+  </div>
+
+  <!-- Message si aucune annonce -->
+  <div *ngIf="!announces || announces.length === 0" class="empty-state">
+    <i class="bi bi-megaphone empty-icon"></i>
+    <h3>Aucune annonce disponible</h3>
+    <p>Les annonces apparaîtront ici une fois ajoutées.</p>
+  </div>
+

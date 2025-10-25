@@ -1,0 +1,124 @@
+<ng-container *ngIf="isAnnonceur; else panelisteNavbar">
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+        
+      </li>
+            <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li *ngIf="selectedId"><a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<ng-template #panelisteNavbar>
+  <!-- NAVBAR Paneliste -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem;">
+  <div class="animate-fade-in" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+        <i class="bi bi-clipboard-check icon-lg" style="margin-right: 0.5rem;"></i> Mes réclamations
+      </h1>
+      <p style="color: #757575; font-size: 1.1rem;">Gérez toutes vos réclamations en un seul endroit</p>
+    </div>
+    
+    <button class="btn-modern btn-primary-pastel" (click)="add()">
+      <i class="bi bi-plus-circle icon-md"></i> Nouvelle réclamation
+    </button>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <div *ngIf="loading" class="spinner-pastel" style="width: 40px; height: 40px; margin: 2rem auto;"></div>
+  <div *ngIf="error" style="background: #FFCDD2; color: #C62828; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+    <i class="bi bi-exclamation-triangle icon-sm"></i> {{ error }}
+  </div>
+  <div *ngIf="!loading && !items.length" style="background: #B3E5FC; color: #01579B; padding: 2rem; border-radius: 0.75rem; text-align: center; margin-bottom: 1.5rem;">
+    <i class="bi bi-info-circle icon-md" style="display: block; margin: 0 auto 1rem; font-size: 2.5rem;"></i>
+    <p style="margin: 0;">Aucune réclamation. <a (click)="add()" style="cursor:pointer; color: #256F86; font-weight: 600; text-decoration: underline;">En créer une</a>.</p>
+  </div>
+
+  <div *ngIf="items.length" class="table-modern card-modern animate-scale-in">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 200px;"><i class="bi bi-tag icon-sm"></i> Motif</th>
+          <th><i class="bi bi-chat-left-text icon-sm"></i> Contenu</th>
+          <th style="width: 180px; text-align: center;"><i class="bi bi-gear icon-sm"></i> Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of items; let idx = index" class="animate-fade-in" [style.animation-delay]="(idx * 50) + 'ms'">
+          <td><span class="badge-pastel badge-blue">{{ r.motif }}</span></td>
+          <td>{{ r.content }}</td>
+          <td style="text-align: center;">
+            <a class="btn-modern btn-primary-pastel"
+               style="font-size: 0.9rem; padding: 0.5rem 1rem;"
+               [routerLink]="['/reclamations', r.idreclamation, 'edit']">
+              <i class="bi bi-pencil icon-sm"></i> Modifier
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

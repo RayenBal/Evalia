@@ -1,0 +1,30 @@
+.notif-card{ width:360px; border-radius:14px; overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.08); }
+.notif-header{ padding:10px 14px; border-bottom:1px solid #eee; background:#fff; }
+.notif-footer{ padding:10px 12px; border-top:1px solid #eee; background:#fff; }
+.notif-scroll{ max-height:420px; overflow:auto; background:#f9fafa; }
+
+.notif-item{
+  display:grid; grid-template-columns:44px 1fr 10px; gap:10px;
+  padding:12px 14px; background:#fff; border-bottom:1px solid #f0f0f0;
+  text-decoration:none; color:inherit; cursor:pointer;
+}
+.notif-item:hover{ background:#f7fbff; }
+.notif-item.seen{ opacity:.72; }
+
+.icon-circle{
+  width:28px; height:28px; border-radius:10px; display:grid; place-items:center;
+  font-size:16px; border:1px solid #e5eefc; background:#eef5ff;
+}
+.icn-reward{ border-color:#ffe4b5; background:#fff7e6; }
+.icn-bell{   border-color:#cde8ff; background:#e7f2ff; }
+
+.body .account{ font-size:11px; font-weight:600; color:#9aa2af; }
+.body .title{ font-weight:700; color:#111827; margin-top:2px; }
+.body .desc{ color:#4b5563; font-size:13px; margin-top:2px; }
+.body .time{ color:#95a0ab; font-size:12px; margin-top:2px; }
+
+.text-truncate-2{
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.dot{ width:10px; height:10px; border-radius:50%; background:#dc3545; align-self:center; }

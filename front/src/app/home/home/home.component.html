@@ -1,0 +1,280 @@
+<!-- NAVBAR MODERNE -->
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <!-- Logo -->
+    <a routerLink="/" style="text-decoration: none;">
+      <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+    </a>
+
+    <!-- Navigation -->
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <li>
+        <a routerLink="/" class="nav-link-modern">
+          <i class="bi bi-house-door" style="margin-right: 0.5rem;"></i> Home
+        </a>
+      </li>
+      <li>
+        <a routerLink="/CategoryList" class="nav-link-modern">
+          <i class="bi bi-folder2-open" style="margin-right: 0.5rem;"></i> Catégories
+        </a>
+      </li>
+      <li>
+        <a routerLink="/announcements" class="nav-link-modern">
+          <i class="bi bi-megaphone" style="margin-right: 0.5rem;"></i> Annonces
+        </a>
+      </li>
+    </ul>
+
+    <!-- Boutons d'authentification -->
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/login" class="btn-modern btn-outline-pastel">
+        Sign in
+      </a>
+      <a href="/register" class="btn-modern btn-primary-pastel">
+        Sign up
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- SECTION CATÉGORIES -->
+<section style="background: linear-gradient(135deg, #E8F4F8 0%, #D5F5E3 100%); padding: 1.5rem 0; border-bottom: 2px solid #A3D3E3;">
+  <div class="container-modern">
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <h5 style="margin: 0; font-weight: 700; color: #256F86; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-tags icon-md icon-blue"></i> Catégories :
+      </h5>
+
+      <!-- Boutons de catégories -->
+      <ng-container *ngFor="let category of categoryList">
+        <button
+          type="button"
+          class="badge-pastel animate-scale-in"
+          [class.badge-blue]="selectedCategory?.idcategory === category.idcategory"
+          [class.badge-lavender]="selectedCategory?.idcategory !== category.idcategory"
+          (click)="selectCategory(category)"
+          style="cursor: pointer; border: none; transition: all 200ms;">
+          {{ category.nameCategory }}
+        </button>
+      </ng-container>
+
+      <!-- Bouton pour effacer le filtre -->
+      <button
+        *ngIf="selectedCategory"
+        type="button"
+        class="btn-modern btn-outline-pastel"
+        (click)="clearCategory()"
+        style="padding: 0.35rem 1rem; font-size: 0.85rem;">
+        <i class="bi bi-x-circle" style="margin-right: 0.25rem;"></i> Effacer le filtre
+      </button>
+
+      <!-- Si pas de catégories -->
+      <ng-container *ngIf="!categoryList?.length">
+        <span class="badge-pastel badge-blue">Électroménager</span>
+        <span class="badge-pastel badge-pink">Skin care</span>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- DÉTAILS DE LA CATÉGORIE SÉLECTIONNÉE -->
+<section *ngIf="selectedCategory" class="animate-fade-in" style="background: white; padding: 1.5rem 0; border-bottom: 1px solid #EEEEEE;">
+  <div class="container-modern">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: #256F86; margin-bottom: 0.25rem;">
+          {{ selectedCategory.nameCategory }}
+        </h3>
+        <p style="color: #757575; margin: 0; font-size: 0.95rem;">
+          {{ selectedCategory.nameCategory }}
+        </p>
+      </div>
+      <span class="badge-pastel badge-blue" *ngIf="announcesByCategory" style="font-size: 1rem; padding: 0.5rem 1.25rem;">
+        <i class="bi bi-bar-chart-fill"></i> {{ announcesByCategory.length }} annonce(s)
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- LISTE DES ANNONCES -->
+
+<main class="container-modern" style="padding-top: 3rem; padding-bottom: 3rem;">
+  <a routerLink="/addAnnounce" class="btn-modern btn-primary-pastel" style="text-decoration: none;">
+      <span>➕</span> Nouvelle annonce
+    </a> 
+    <i class="bi bi-exclamation-triangle-fill" style="font-size:1.25rem; color:#F59E0B;"></i>
+  Seuls les annonceurs connectés peuvent ajouter des annonces!
+  <!-- En-tête -->
+  <div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+      {{ selectedCategory ? ('Annonces — ' + selectedCategory.nameCategory) : 'Toutes les annonces' }}
+    </h1>
+    <p style="color: #757575; font-size: 1.1rem;">Découvrez toutes nos annonces disponibles</p>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <!-- Message si aucune annonce -->
+  <div *ngIf="!displayedAnnounces?.length" 
+       class="animate-scale-in" 
+       style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #D1E9F1 0%, #E6E6FA 100%); border-radius: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <i class="bi bi-megaphone icon-xl icon-blue" style="margin-bottom: 1.5rem; display: block;"></i>
+    <h3 style="color: #256F86; font-weight: 700; margin-bottom: 0.75rem;">Aucune annonce disponible</h3>
+    <p style="color: #616161;">Les annonces apparaîtront ici une fois ajoutées.</p>
+  </div>
+
+  <!-- Grille des annonces -->
+  <div class="grid-modern" *ngIf="displayedAnnounces?.length" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+    <div *ngFor="let announce of displayedAnnounces; let i = index" 
+         class="card-modern animate-fade-in"
+         [style.animation-delay]="(i * 100) + 'ms'">
+      
+      <!-- Image de l'annonce -->
+      <a [routerLink]="['/announcementPaneliste/details', announce.idAnnouncement]" style="display: block; position: relative; overflow: hidden; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+        <img
+          class="img-modern"
+          [src]="getImageUrl(announce.image)"
+          [alt]="announce.announceName || 'Annonce'"
+          style="width: 100%; height: 220px; object-fit: cover; transition: transform 400ms ease-in-out;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        />
+      </a>
+
+      <!-- Contenu de la carte -->
+      <div>
+        <h5 style="color: #256F86; font-weight: 700; font-size: 1.25rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+            [title]="announce.announceName">
+          {{ announce.announceName }}
+        </h5>
+        
+        <p style="color: #616161; line-height: 1.6; max-height: 3.5rem; overflow: hidden; margin-bottom: 1.25rem;">
+          {{ announce.content }}
+        </p>
+
+        <!-- Récompenses -->
+<ng-container *ngIf="rewardsById?.[announce.idAnnouncement!] as rw; else noRw">
+  <ng-container *ngIf="rw?.text; else noRw">
+    <span class="badge-pastel badge-mint">
+      <i class="bi bi-gift"></i> {{ rw.text }}
+    </span>
+  </ng-container>
+</ng-container>
+<ng-template #noRw>
+  <small style="color:#9E9E9E; font-style:italic;">— aucune récompense</small>
+</ng-template>
+
+        <!-- Bouton Voir détails -->
+        <a [routerLink]="['/announcementPaneliste/details', announce.idAnnouncement]" 
+           class="btn-modern btn-primary-pastel" 
+           style="width: 100%; justify-content: center; text-decoration: none;">
+          <i class="bi bi-eye"></i> Voir les détails
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer style="background: linear-gradient(135deg, #E8F4F8 0%, #D5F5E3 100%); border-top: 2px solid #A3D3E3; padding: 3rem 0; margin-top: 3rem;">
+  <div class="container-modern">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+      
+      <!-- Section À propos -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-info-circle"></i> À propos d'Evalia
+        </h4>
+        <p style="color: #616161; line-height: 1.6; margin: 0;">
+          Bienvenue sur notre plateforme, un lieu unique de rencontre entre annonceurs et panélistes.
+          Nous avons créé cet espace pour favoriser un dialogue direct et constructif : les annonceurs peuvent présenter leurs produits, services ou campagnes, tandis que les panélistes partagent leurs avis, leurs idées et leurs expériences de manière libre et authentique.
+        </p>
+      </div>
+
+      <!-- Section Contactez-nous -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-envelope"></i> Contactez-nous
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Email -->
+          <a href="mailto:suppevalia@gmail.com" 
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-envelope-fill" style="color: #256F86;"></i>
+            suppevalia&#64;gmail.com
+          </a>
+          
+          <!-- Téléphone -->
+          <a href="tel:+21698143895" 
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-telephone-fill" style="color: #256F86;"></i>
+            +216 98 143 895
+          </a>
+          
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/profile.php?id=61570772838854" 
+             target="_blank"
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#1877F2'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-facebook" style="color: #1877F2;"></i>
+            Page Facebook
+          </a>
+        </div>
+      </div>
+
+      <!-- Section Liens rapides -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-link-45deg"></i> Liens rapides
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <a routerLink="/" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-house-door"></i> Accueil
+          </a>
+          <a routerLink="/CategoryList" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-folder2-open"></i> Catégories
+          </a>
+          <a routerLink="/announcements" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-megaphone"></i> Annonces
+          </a>
+          <a routerLink="/login" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-box-arrow-in-right"></i> Se connecter
+          </a>
+          <a routerLink="/register" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-person-plus"></i> S'inscrire
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ligne de séparation -->
+    <hr style="border: none; border-top: 1px solid rgba(37, 111, 134, 0.2); margin: 2rem 0;">
+
+    <!-- Copyright -->
+    <div style="text-align: center;">
+      <p style="color: #757575; margin: 0; font-size: 0.95rem;">
+        © {{ today | date:'yyyy' }} <span class="text-gradient" style="font-weight: 700;">Evalia</span> — Tous droits réservés
+      </p>
+    </div>
+  </div>
+</footer>

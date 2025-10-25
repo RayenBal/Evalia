@@ -1,0 +1,312 @@
+
+<ng-container *ngIf="isAnnonceur; else panelisteNavbar">
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+            <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+       <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<ng-template #panelisteNavbar>
+  <!-- NAVBAR Paneliste -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+      <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 900px;">
+  <div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+      <button type="button" class="btn-modern btn-outline-pastel" (click)="goBack()">
+        <i class="bi bi-arrow-left icon-sm"></i> Retour
+      </button>
+    </div>
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+      <i class="bi bi-person-circle icon-lg" style="margin-right: 0.5rem;"></i> Mon profil
+    </h1>
+    <p style="color: #757575; font-size: 1.1rem;">Gérez vos informations personnelles</p>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <div *ngIf="loading" class="spinner-pastel" style="width: 40px; height: 40px; margin: 2rem auto;"></div>
+  <div *ngIf="error" style="background: #FFCDD2; color: #C62828; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+    <i class="bi bi-exclamation-triangle icon-sm"></i> {{ error }}
+  </div>
+
+  <ng-container *ngIf="me">
+    <div *ngIf="info" style="background: #B3E5FC; color: #01579B; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+      <i class="bi bi-info-circle icon-sm"></i> {{ info }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="card-modern animate-scale-in" style="margin-bottom: 2rem;">
+      <h3 style="color: #256F86; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-person-badge icon-md icon-blue"></i> Informations personnelles
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-person icon-sm"></i> Prénom
+          </label>
+          <input class="input-modern" formControlName="firstname">
+        </div>
+        <div>
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-person icon-sm"></i> Nom
+          </label>
+          <input class="input-modern" formControlName="lastname">
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-telephone icon-sm"></i> Téléphone
+          </label>
+          <input class="input-modern" formControlName="numTelephone">
+        </div>
+
+        <div *ngIf="me.typeUser === 'Announceur'">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-building icon-sm"></i> Entreprise
+          </label>
+          <input class="input-modern" formControlName="companyName">
+        </div>
+
+        <div *ngIf="me.typeUser === 'Paneliste'">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-briefcase icon-sm"></i> Poste
+          </label>
+          <input class="input-modern" formControlName="jobTitle">
+        </div>
+
+        <div *ngIf="me.typeUser === 'Paneliste'">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-calendar-event icon-sm"></i> Tranche d'âge
+          </label>
+          <select class="input-modern" formControlName="ageRange">
+            <option value="">— Sélectionner —</option>
+            <option *ngFor="let a of ageRanges" [value]="a">{{ a }}</option>
+          </select>
+        </div>
+
+
+
+
+        <!-- IBAN (paneliste) -->
+       
+<!-- Adresse de livraison (Paneliste) -->
+<div class="col-12" *ngIf="me?.typeUser === 'Paneliste'">
+  <label class="form-label fw-semibold">Adresse de livraison</label>
+  <textarea class="form-control" rows="2"
+            formControlName="deliveryAddress"
+            [attr.placeholder]="(me?.deliveryAddress || '').trim() || 'Rue, ville, code postal'">
+  </textarea>
+
+  <div class="text-danger small"
+       *ngIf="form.get('deliveryAddress')?.touched && form.get('deliveryAddress')?.invalid">
+    Adresse requise
+  </div>
+  <div class="form-text">
+    Utilisée pour l’envoi des produits.
+  </div>
+</div>
+
+<!-- IBAN POUR PANELISTE -->
+<div *ngIf="me?.typeUser === 'Paneliste'"
+     class="animate-fade-in"
+     style="margin-bottom: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #D5F5E3 0%, #B8ECD0 100%); border-radius: 0.75rem;">
+
+  <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.75rem;">
+    <i class="bi bi-credit-card" style="margin-right: 0.5rem;"></i> Mode de paiement (IBAN)
+  </label>
+
+  <input class="input-modern"
+         formControlName="iban"
+         [attr.placeholder]="formatIban(me?.iban || '') || 'TN59 1234 5678 9012 3456 7890 1234'"
+         style="background: white; font-family: 'Courier New', monospace; letter-spacing: 1px;">
+
+  <small style="display: block; color: #616161; margin-top: 0.5rem;">
+    <i class="bi bi-info-circle"></i> Votre IBAN pour recevoir vos récompenses en argent
+  </small>
+
+  <div class="text-danger"
+       *ngIf="form.get('iban')?.touched && form.get('iban')?.invalid">
+    IBAN requis / invalide.
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+
+      <button class="btn-modern btn-primary-pastel" type="submit" [disabled]="saving || form.invalid" [style.opacity]="(saving || form.invalid) ? '0.6' : '1'">
+        <span *ngIf="saving" class="spinner-pastel" style="width: 18px; height: 18px; border-width: 2px; margin-right: 0.5rem;"></span>
+        <i class="bi bi-save icon-sm" *ngIf="!saving" style="margin-right: 0.5rem;"></i>
+        {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+      </button>
+    </form>
+
+    <form [formGroup]="pwdForm" (ngSubmit)="changePassword()" autocomplete="off" class="card-modern animate-scale-in delay-100">
+      <h3 style="color: #256F86; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-shield-lock icon-md icon-blue"></i> Changer mon mot de passe
+      </h3>
+
+      <div *ngIf="pwdInfo" style="background: #C8E6C9; color: #2E7D32; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+        <i class="bi bi-check-circle icon-sm"></i> {{ pwdInfo }}
+      </div>
+      <div *ngIf="pwdError" style="background: #FFCDD2; color: #C62828; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+        <i class="bi bi-exclamation-triangle icon-sm"></i> {{ pwdError }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="grid-column: span 2;">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-lock icon-sm"></i> Mot de passe actuel
+          </label>
+          <div style="position: relative;">
+            <input
+              [type]="showCur ? 'text' : 'password'"
+              class="input-modern"
+              formControlName="currentPassword"
+              style="padding-right: 3rem;">
+            <button
+              type="button"
+              (click)="showCur = !showCur"
+              style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #757575; font-size: 1.25rem;"
+              [attr.aria-pressed]="showCur"
+              aria-label="Afficher/masquer le mot de passe actuel">
+              <i [class]="showCur ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-lock-fill icon-sm"></i> Nouveau mot de passe
+          </label>
+          <div style="position: relative;">
+            <input
+              [type]="showNew ? 'text' : 'password'"
+              class="input-modern"
+              formControlName="newPassword"
+              placeholder="Min. 8 caractères"
+              style="padding-right: 3rem;">
+            <button
+              type="button"
+              (click)="showNew = !showNew"
+              style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #757575; font-size: 1.25rem;"
+              [attr.aria-pressed]="showNew"
+              aria-label="Afficher/masquer le nouveau mot de passe">
+              <i [class]="showNew ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+          <small *ngIf="pwdForm.hasError('same') && pwdForm.touched" style="color: #C62828; display: block; margin-top: 0.5rem;">
+            <i class="bi bi-exclamation-circle icon-sm"></i> Le nouveau mot de passe doit être différent de l'ancien.
+          </small>
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-lock-fill icon-sm"></i> Confirmer le nouveau mot de passe
+          </label>
+          <div style="position: relative;">
+            <input
+              [type]="showConf ? 'text' : 'password'"
+              class="input-modern"
+              formControlName="confirm"
+              style="padding-right: 3rem;">
+            <button
+              type="button"
+              (click)="showConf = !showConf"
+              style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #757575; font-size: 1.25rem;"
+              [attr.aria-pressed]="showConf"
+              aria-label="Afficher/masquer la confirmation">
+              <i [class]="showConf ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+          <small *ngIf="pwdForm.hasError('mismatch') && pwdForm.touched" style="color: #C62828; display: block; margin-top: 0.5rem;">
+            <i class="bi bi-exclamation-circle icon-sm"></i> La confirmation ne correspond pas.
+          </small>
+        </div>
+      </div>
+
+      <button class="btn-modern btn-primary-pastel" type="submit" [disabled]="pwdSaving || pwdForm.invalid" [style.opacity]="(pwdSaving || pwdForm.invalid) ? '0.6' : '1'">
+        <span *ngIf="pwdSaving" class="spinner-pastel" style="width: 18px; height: 18px; border-width: 2px; margin-right: 0.5rem;"></span>
+        <i class="bi bi-key icon-sm" *ngIf="!pwdSaving" style="margin-right: 0.5rem;"></i>
+        {{ pwdSaving ? 'Enregistrement…' : 'Mettre à jour mon mot de passe' }}
+      </button>
+    </form>
+  </ng-container>
+</div>

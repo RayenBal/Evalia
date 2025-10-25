@@ -1,0 +1,9 @@
+/* src/app/category/categoryDetail/category-detail.component.css */
+.container { max-width: 800px; margin: 0 auto; }
+.card { border: 1px solid #eee; border-radius: 8px; padding: 12px; }
+.error { color: #b00020; }
+.announce-list { list-style: none; padding: 0; }
+.announce-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+.announce-title { font-weight: 600; }
+.announce-meta { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+.announce-content { margin-top: 6px; }

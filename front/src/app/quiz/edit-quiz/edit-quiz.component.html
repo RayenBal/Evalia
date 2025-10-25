@@ -1,0 +1,142 @@
+<!-- NAVBAR MODERNE ANNONCEUR -->
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <a routerLink="/annonceur/home" style="text-decoration: none; cursor: pointer;">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+         <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+      
+
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+
+
+
+
+
+<div class="quiz-edit-container" *ngIf="!loading; else loadingTpl">
+  <div class="quiz-edit-wrapper">
+    <h2 class="page-title">Modifier le quiz</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <!-- Quiz Title Section -->
+      <div class="quiz-title-section">
+        <label class="section-label">Titre / contenu du quiz</label>
+        <input
+          class="quiz-input"
+          formControlName="content"
+          placeholder="Entrez le titre du quiz"
+        />
+      </div>
+
+      <!-- Questions Section -->
+      <div formArrayName="questions">
+        <div
+          class="question-card"
+          *ngFor="let q of questions.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <!-- Question Header -->
+          <div class="question-header">
+            <h5 class="question-title">Question {{ i + 1 }}</h5>
+            <button
+              type="button"
+              class="btn-delete-question"
+              (click)="removeQuestion(i)"
+            >
+              Supprimer
+            </button>
+          </div>
+
+          <!-- Question Input -->
+          <input
+            class="question-input"
+            formControlName="content"
+            placeholder="Intitulé de la question"
+          />
+
+          <!-- Responses Section -->
+          <div formArrayName="responses" class="responses-section">
+            <div class="responses-header">
+              <strong class="responses-label">Réponses</strong>
+              <button
+                type="button"
+                class="btn-add-response"
+                (click)="addResponse(i)"
+              >
+                + Réponse
+              </button>
+            </div>
+
+            <!-- Response Items -->
+            <div
+              class="response-item"
+              *ngFor="let _r of responsesOf(i).controls; let j = index"
+              [formGroupName]="j"
+            >
+              <input
+                class="response-input"
+                formControlName="content"
+                placeholder="Texte de la réponse"
+              />
+              <button
+                type="button"
+                class="btn-delete-response"
+                (click)="removeResponse(i, j)"
+              >
+                X
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Question Button -->
+      <button
+        type="button"
+        class="btn-add-question"
+        (click)="addQuestion()"
+      >
+        + Question
+      </button>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button type="submit" class="btn-save">Enregistrer</button>
+        <button type="button" class="btn-cancel" (click)="cancel()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement…</p>
+  </div>
+</ng-template>

@@ -1,0 +1,32 @@
+<section class="content" style="background-color: white;">
+  <div class="content-block">
+    <div class="block-header">
+      <!-- breadcrumb -->
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <!-- Button and Filters -->
+              <div class="col-md-2 col-sm-12 p-l-30">
+                <div class="m-b-25">
+                  <button mat-raised-button color="primary" (click)="addNewEvent()">Ajouter planning</button>
+                </div>
+                
+                
+              </div>
+
+              <!-- Calendar -->
+              <div class="col-md-10 col-sm-12">
+                <div class="panel-body">
+                  <full-calendar [options]="calendarOptions"></full-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

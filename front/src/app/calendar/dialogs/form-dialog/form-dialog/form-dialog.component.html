@@ -1,0 +1,75 @@
+<div class="addContainer">
+  <div class="modalHeader">
+    <div class="modal-about">
+      {{ createMode ? 'Nouveau créneau' : 'Rendez-vous' }}
+    </div>
+    <button type="button" (click)="dialogRef.close()" aria-label="Close dialog">✖</button>
+  </div>
+
+  <div *ngIf="isAnnonceur">
+
+    <form [formGroup]="createForm">
+      <div class="form-group">
+        <label for="announcementId">Annonce</label>
+        <select id="announcementId" formControlName="announcementId" class="w-100">
+          <option *ngFor="let a of announces" [value]="a.idAnnouncement">
+            {{ a.announceName || a.idAnnouncement }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="panelistId">Paneliste</label>
+        <select id="panelistId" formControlName="panelistId" class="w-100">
+          <option *ngFor="let p of panelists" [value]="p.id_user">
+            {{ p.firstname }} {{ p.lastname }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="startsAt">Début</label>
+        <input id="startsAt" type="datetime-local" formControlName="startsAt" class="w-100" />
+      </div>
+
+      <div class="form-group">
+        <label for="endsAt">Fin</label>
+        <input id="endsAt" type="datetime-local" formControlName="endsAt" class="w-100" />
+      </div>
+
+      <button type="button" (click)="createSlot()" [disabled]="createForm.invalid">
+        Créer
+      </button>
+      <button type="button" (click)="dialogRef.close()">Annuler</button>
+    </form>
+  </div>
+
+ <!-- ————————————————————————
+       FICHE RDV (paneliste) : consulter/changer statut
+       ———————————————————————— -->
+   <!-- Consultation + changement de statut (paneliste assigné) -->
+  <div *ngIf="!isAnnonceur && appointment">
+    <p><b>Annonce :</b> {{ appointment.announcement?.announceName }}</p>
+    <p><b>Début :</b> {{ appointment.startsAt | date:'yyyy-MM-dd HH:mm' }}</p>
+    <p><b>Fin :</b> {{ appointment.endsAt   | date:'yyyy-MM-dd HH:mm' }}</p>
+    <p><b>Statut actuel :</b> {{ appointment.status }}</p>
+
+    <!-- SI le paneliste est bien le titulaire du RDV -->
+    <ng-container *ngIf="canPanelistEdit; else readOnly">
+      <h3>Changer le statut</h3>
+      <form [formGroup]="statusForm">
+        <div class="form-group">
+          <label for="status">Statut</label>
+          <select id="status" formControlName="status" class="w-100">
+            <option *ngFor="let s of panelistOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+        <button type="button" (click)="changeStatus()" [disabled]="statusForm.invalid">
+          Mettre à jour
+        </button>
+      </form>
+    </ng-container>
+
+    <ng-template #readOnly>
+      <p><i>Vous ne pouvez pas modifier ce statut.</i></p>
+    </ng-template>
+  </div>
+</div>

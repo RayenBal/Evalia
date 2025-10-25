@@ -1,0 +1,253 @@
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+  <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+
+<div class="container-modern" style="padding: 2rem 1rem; min-height: 100vh;" *ngIf="announce">
+  
+  <!-- En-tête avec boutons d'action -->
+  <div class="card-modern animate-fade-in" style="padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-megaphone icon-lg"></i>
+        Détails de l'annonce
+      </h1>
+      <p style="color: #6B7280; margin: 0;">Gérez votre annonce et ses quiz</p>
+    </div>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <a class="btn-modern btn-primary-pastel" routerLink="/addAnnounce">
+        <i class="bi bi-plus-circle icon-sm"></i> Nouvelle annonce
+      </a>
+      <button class="btn-modern btn-secondary-pastel" [routerLink]="['/add']" [queryParams]="{ announceId: announceId }">
+        <i class="bi bi-question-circle icon-sm"></i> Ajouter un quiz
+      </button>
+    </div>
+  </div>
+
+  <!-- Informations principales -->
+  <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;">
+    <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-info-circle icon-md"></i>
+      {{ announce.announceName }}
+    </h2>
+
+    <div style="display: grid; gap: 1.5rem;">
+      <!-- Description -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="bi bi-card-text icon-sm"></i> Description
+        </label>
+        <p style="color: #6B7280; line-height: 1.6; margin: 0;">{{ announce.content }}</p>
+      </div>
+
+      <!-- Adresse du bureau -->
+      <div *ngIf="announce.officeAddress">
+        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="bi bi-building icon-sm"></i> Adresse du bureau
+        </label>
+        <p style="color: #6B7280; margin: 0;">{{ announce.officeAddress }}</p>
+      </div>
+
+      <!-- Modes de test -->
+      <div *ngIf="announce.testModes && announce.testModes.length > 0">
+        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="bi bi-check2-circle icon-sm"></i> Modes de test
+        </label>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <span *ngFor="let mode of announce.testModes" class="badge-pastel badge-blue" style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi bi-check-lg icon-sm"></i> {{ formatTestMode(mode) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Images -->
+  <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;" *ngIf="announce.image || announce.productImages">
+    <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-images icon-md"></i>
+      Images
+    </h2>
+
+    <!-- Image principale -->
+    <div *ngIf="announce.image" style="margin-bottom: 2rem;">
+      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-image icon-sm"></i> Image principale
+      </label>
+      <img [src]="getImageUrl(announce.image)" class="img-modern" style="max-width: 300px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+    </div>
+
+    <!-- Images produit -->
+    <div *ngIf="announce.productImages">
+      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-images icon-sm"></i> Images du produit
+      </label>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+        <img *ngFor="let img of announce.productImages.split(',')" 
+             [src]="getImageUrl(img)" 
+             class="img-modern" 
+             style="width: 100%; height: 150px; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz associés -->
+  <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;" *ngIf="announce.quizList && announce.quizList.length > 0; else noQuiz">
+    <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-question-circle icon-md"></i>
+      Quiz associés ({{ announce.quizList.length }})
+    </h2>
+
+    <div style="display: grid; gap: 1.5rem;">
+      <div *ngFor="let quiz of announce.quizList; let qi = index" class="card-modern" style="padding: 1.5rem; border-left: 4px solid var(--pastel-blue-600);">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: #1F2937; margin-bottom: 0.5rem;">
+              Quiz {{ qi + 1 }}
+            </h3>
+            <p style="color: #6B7280; margin: 0;">{{ quiz.content }}</p>
+          </div>
+          <span class="badge-pastel badge-blue">Quiz #{{ qi + 1 }}</span>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <a class="btn-modern btn-secondary-pastel" [routerLink]="['/quiz/details', getQuizId(quiz)]" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-eye icon-sm"></i> Voir
+          </a>
+          <button class="btn-modern btn-warning-pastel" 
+                  *ngIf="announce"
+                  [routerLink]="['/quiz/edit', getQuizId(quiz)]"
+                  [queryParams]="{ announceId: announce.idAnnouncement }"
+                  style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-pencil icon-sm"></i> Modifier
+          </button>
+          <button class="btn-modern btn-primary-pastel"
+                  [routerLink]="['/take-quiz', announce!.idAnnouncement, getQuizId(quiz)]"
+                  [disabled]="!(auth.isAuthenticated() && auth.isPaneliste)"
+                  style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-pencil-square icon-sm"></i> Répondre
+          </button>
+          <button class="btn-modern btn-info-pastel"
+                  *ngIf="auth.userType === 'Announceur'"
+                  [routerLink]="['/announcement', announce!.idAnnouncement, 'results']"   [queryParams]="{ quiz: getQuizId(quiz) }"
+                  style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-bar-chart icon-sm"></i> Résultats
+          </button>
+          <button class="btn-modern btn-danger-pastel" (click)="deleteQuiz(getQuizId(quiz))" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-trash icon-sm"></i> Supprimer
+          </button>
+        </div>
+
+        <small *ngIf="!(auth.isAuthenticated() && auth.isPaneliste)" style="display: block; margin-top: 0.75rem; color: #9CA3AF; font-style: italic;">
+          <i class="bi bi-info-circle icon-sm"></i> Connectez-vous en tant que panéliste pour répondre
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aucun quiz -->
+  <ng-template #noQuiz>
+    <div class="card-modern animate-scale-in" style="padding: 3rem; margin-bottom: 2rem; text-align: center;">
+      <i class="bi bi-inbox icon-xl" style="color: var(--pastel-blue-400); display: block; margin-bottom: 1rem;"></i>
+      <p style="color: #6B7280; font-size: 1.125rem; margin: 0;">Aucun quiz associé à cette annonce.</p>
+      <button class="btn-modern btn-primary-pastel" [routerLink]="['/add']" [queryParams]="{ announceId: announceId }" style="margin-top: 1.5rem;">
+        <i class="bi bi-plus-circle icon-sm"></i> Créer le premier quiz
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Récompenses -->
+  <div class="card-modern animate-scale-in" style="padding: 2rem;">
+    <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-gift icon-md"></i>
+      Récompenses
+    </h2>
+
+    <div *ngIf="announce?.recompensesList?.length; else noRewards">
+      <div class="table-modern">
+        <table style="width: 100%;">
+          <thead>
+            <tr>
+              <th><i class="bi bi-tag icon-sm"></i> Type</th>
+              <th><i class="bi bi-cash-coin icon-sm"></i> Montant</th>
+              <th><i class="bi bi-card-text icon-sm"></i> Libellé</th>
+              <th style="text-align: center;"><i class="bi bi-gear icon-sm"></i> Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of announce!.recompensesList; trackBy: trackByRec">
+              <td>
+                <span class="badge-pastel" 
+                      [ngClass]="{
+                        'badge-yellow': r?.typeRecompenses === 'Points',
+                        'badge-green': r?.typeRecompenses === 'Argent',
+                        'badge-purple': r?.typeRecompenses === 'BonsDachats'
+                      }">
+                  {{ formatRewardType(r?.typeRecompenses) }}
+                </span>
+              </td>
+              <td style="font-weight: 600; color: #374151;">
+                <ng-container [ngSwitch]="r?.typeRecompenses">
+                  <span *ngSwitchCase="'Points'">{{ r?.amount }} pts</span>
+                  <span *ngSwitchDefault>{{ r?.amount }} TND</span>
+                </ng-container>
+              </td>
+              <td style="color: #6B7280;">{{ r?.label || '—' }}</td>
+              <td>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                  <button class="btn-modern btn-warning-pastel"
+                          [routerLink]="['/recompenses/edit', getRecId(r)]"
+                          [queryParams]="{ announceId: announceId }"
+                          style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    <i class="bi bi-pencil icon-sm"></i>
+                  </button>
+                  <button class="btn-modern btn-danger-pastel" 
+                          (click)="deleteRecompense(getRecId(r))"
+                          style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    <i class="bi bi-trash icon-sm"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <ng-template #noRewards>
+      <div style="padding: 2rem; text-align: center; background: var(--pastel-blue-50); border-radius: var(--radius-lg);">
+        <i class="bi bi-inbox icon-xl" style="color: var(--pastel-blue-400); display: block; margin-bottom: 0.75rem;"></i>
+        <p style="color: #6B7280; margin: 0;">Aucune récompense définie pour cette annonce.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

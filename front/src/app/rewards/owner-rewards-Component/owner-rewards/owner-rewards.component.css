@@ -1,0 +1,4 @@
+  .table-wrapper { overflow-x: auto; }
+  .text-nowrap { white-space: nowrap; }
+  table.table-modern-fixed { table-layout: fixed; min-width: 1350px; }
+  th, td { vertical-align: middle; }

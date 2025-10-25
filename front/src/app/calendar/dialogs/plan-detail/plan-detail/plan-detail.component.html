@@ -1,0 +1,53 @@
+<!-- src/app/modules/calendar/dialogs/plan-detail/plan-detail/plan-detail.component.html -->
+<div class="viewContainer">
+  <div class="modalHeader">
+    <div class="modal-about">Rendez-vous du jour</div>
+    <button mat-icon-button (click)="dialogRef.close()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div mat-dialog-content>
+    <table class="mat-elevation-z8" style="width:100%">
+      <thead>
+      <tr>
+        <th>Annonce</th>
+        <th>Paneliste</th>
+        <th>Début</th>
+        <th>Fin</th>
+        <th>Statut</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let a of rows">
+        <td>{{ a.announcement?.announceName || 'Annonce' }}</td>
+        <td>{{ name(a.panelist) || '—' }}</td>
+        <td>{{ a.startsAt | date:'yyyy-MM-dd HH:mm' }}</td>
+        <td>{{ a.endsAt   | date:'yyyy-MM-dd HH:mm' }}</td>
+
+        <td>
+          <!-- lecture seule pour tout le monde par défaut -->
+          <span *ngIf="!canEdit(a)">{{ a.status }}</span>
+
+          <!-- paneliste assigné : peut choisir CONFIRMED ou CANCELLED -->
+       <select
+  *ngIf="canEdit(a)"
+  [value]="a.status"
+  (change)="changeStatus(a, ($any($event.target)).value)"
+>
+  <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+</select>
+        </td>
+
+        <td>
+          <span *ngIf="canEdit(a); else ro">Peut modifier</span>
+          <ng-template #ro>—</ng-template>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close()">Fermer</button>
+  </div>
+</div>

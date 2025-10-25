@@ -1,0 +1,109 @@
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+            <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announces" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li *ngIf="selectedId"><a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+<!-- CONTENU PRINCIPAL -->
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem;">
+  
+  <!-- EN-TÊTE -->
+  <div class="animate-fade-in" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+        📢 Mes annonces
+      </h1>
+      <p style="color: #757575; font-size: 1.1rem; margin: 0;">Gérez toutes vos annonces en un seul endroit</p>
+    </div>
+    
+    <a routerLink="/addAnnounce" class="btn-modern btn-primary-pastel" style="text-decoration: none;">
+      <i class="bi bi-plus-circle icon-md"></i> Nouvelle annonce
+    </a>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <!-- MESSAGE SI AUCUNE ANNONCE -->
+  <div *ngIf="announces.length === 0" 
+       class="animate-scale-in" 
+       style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #D1E9F1 0%, #E6E6FA 100%); border-radius: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <div style="font-size: 4rem; margin-bottom: 1.5rem;">📭</div>
+    <h3 style="color: #256F86; font-weight: 700; margin-bottom: 0.75rem;">Aucune annonce disponible</h3>
+    <p style="color: #616161; margin-bottom: 2rem;">Créez votre première annonce pour commencer</p>
+    <a routerLink="/addAnnounce" class="btn-modern btn-primary-pastel" style="text-decoration: none;">
+      <span>✨</span> Créer une annonce
+    </a>
+  </div>
+
+  <!-- GRILLE DES ANNONCES -->
+  <div class="grid-modern" *ngIf="announces.length > 0" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+    <div *ngFor="let announce of announces; let i = index" 
+         class="card-modern animate-fade-in"
+         [style.animation-delay]="(i * 100) + 'ms'">
+      
+      <!-- IMAGE -->
+      <a [routerLink]="['/announcement/details', announce.idAnnouncement]" style="display: block; position: relative; overflow: hidden; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+        <img
+          class="img-modern"
+          [src]="announce.image ? getImageUrl(announce.image) : 'assets/no-image.png'"
+          [alt]="announce.announceName"
+          style="width: 100%; height: 200px; object-fit: cover; transition: transform 400ms ease-in-out;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        />
+      </a>
+
+      <!-- CONTENU -->
+      <div style="margin-bottom: 1.5rem;">
+        <h5 style="color: #256F86; font-weight: 700; font-size: 1.25rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {{ announce.announceName }}
+        </h5>
+        <p style="color: #616161; line-height: 1.6; max-height: 3rem; overflow: hidden; margin: 0;">
+          {{ announce.content }}
+        </p>
+      </div>
+
+      <!-- ACTIONS -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding-top: 1.5rem; border-top: 2px solid #EEEEEE;">
+        <button
+          [routerLink]="['/announcement/details', announce.idAnnouncement]"
+          class="btn-modern btn-primary-pastel"
+          style="font-size: 0.9rem; padding: 0.65rem 1rem; justify-content: center;">
+          <i class="bi bi-eye icon-sm"></i> Détails
+        </button>
+
+       
+
+      
+
+       
+      </div>
+    </div>
+  </div>
+</div>

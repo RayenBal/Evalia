@@ -1,0 +1,184 @@
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+        
+      </li>
+            <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+
+
+<div class="container-modern" style="padding: 2rem 1rem; min-height: 100vh;">
+  
+  <!-- En-tête -->
+  <div class="card-modern animate-fade-in" style="padding: 2rem; margin-bottom: 2rem; text-align: center;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+      <i class="bi bi-question-circle icon-xl"></i>
+      {{ isEdit ? 'Modifier le Quiz' : 'Créer un Quiz' }}
+    </h1>
+    <p style="color: #6B7280; font-size: 1.125rem; margin: 0;">
+      {{ isEdit ? 'Modifiez les questions de votre quiz' : 'Créez un quiz pour évaluer vos panélistes' }}
+    </p>
+    <div class="divider-pastel"></div>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="quizForm" (ngSubmit)="onSubmit()">
+    
+    <!-- Titre du Quiz -->
+    <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;">
+      <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 1rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-card-text icon-md"></i> Titre du Quiz
+        <span style="color: #EF4444;">*</span>
+      </label>
+      <input class="input-modern" 
+             formControlName="content" 
+             placeholder="Ex: Quiz sur votre type de peau" 
+             style="font-size: 1.125rem; padding: 1rem 1.5rem;" />
+    </div>
+
+    <!-- Questions -->
+    <div formArrayName="questions" style="display: grid; gap: 2rem;">
+      <div *ngFor="let question of questions.controls; let i = index" 
+           [formGroupName]="i" 
+           class="card-modern animate-scale-in" 
+           [style.animation-delay]="(i * 0.1) + 's'"
+           style="padding: 2rem; border-left: 4px solid #47A7C7;">
+        
+        <!-- En-tête de la question -->
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-patch-question icon-md"></i> Question {{ i + 1 }}
+              <span style="color: #EF4444;">*</span>
+            </label>
+            <input class="input-modern" 
+                   formControlName="content" 
+                   placeholder="Ex: Quel est votre type de peau ?" />
+          </div>
+          <button class="btn-modern btn-danger-pastel" 
+                  type="button" 
+                  (click)="removeQuestion(i)" 
+                  style="font-size: 0.875rem; padding: 0.625rem 1.25rem;">
+            <i class="bi bi-trash icon-sm"></i> Supprimer
+          </button>
+        </div>
+
+        <!-- Réponses -->
+        <div formArrayName="responses" style="margin-left: 1.5rem; padding-left: 1.5rem; border-left: 3px solid #D1E9F1;">
+          <div style="margin-bottom: 1rem;">
+            <p style="font-weight: 600; color: #256F86; font-size: 0.875rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-check2-square icon-sm"></i> Réponses possibles
+            </p>
+          </div>
+
+          <div *ngFor="let response of getResponses(i).controls; let j = index" 
+               [formGroupName]="j" 
+               style="margin-bottom: 1rem;">
+            
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <!-- Input réponse -->
+              <div style="flex: 1;">
+                <input class="input-modern" 
+                       formControlName="content" 
+                       placeholder="Ex: Peau sèche" 
+                       style="padding: 0.75rem 1rem;" />
+              </div>
+
+              <!-- Checkbox correct -->
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #E8F4F8; border-radius: var(--radius-md); cursor: pointer; white-space: nowrap; min-width: 120px;">
+                <input type="checkbox" 
+                       formControlName="isCorrect" 
+                       style="width: 18px; height: 18px; cursor: pointer; accent-color: #47A7C7;" />
+                <span style="font-size: 0.875rem; font-weight: 600; color: #256F86;">
+                  <i class="bi bi-check-circle icon-sm"></i> Correcte
+                </span>
+              </label>
+
+              <!-- Bouton supprimer -->
+              <button class="btn-modern btn-danger-pastel" 
+                      type="button" 
+                      (click)="removeResponse(i, j)" 
+                      style="font-size: 0.875rem; padding: 0.75rem 1rem;">
+                <i class="bi bi-x icon-sm"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bouton ajouter réponse -->
+          <button class="btn-modern btn-outline-pastel" 
+                  type="button" 
+                  (click)="addResponse(i)" 
+                  style="margin-top: 0.5rem; font-size: 0.875rem; padding: 0.625rem 1.25rem;">
+            <i class="bi bi-plus-circle icon-sm"></i> Ajouter une réponse
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune question -->
+    <div *ngIf="questions.controls.length === 0" 
+         class="card-modern animate-scale-in" 
+         style="padding: 3rem; text-align: center; background: linear-gradient(135deg, #E8F4F8 0%, #D1E9F1 100%);">
+      <i class="bi bi-inbox icon-xl" style="color: #47A7C7; display: block; margin-bottom: 1rem;"></i>
+      <p style="color: #6B7280; font-size: 1.125rem; margin: 0 0 1.5rem 0;">Aucune question ajoutée pour le moment</p>
+      <p style="color: #9CA3AF; font-size: 0.875rem; margin: 0;">Cliquez sur le bouton ci-dessous pour ajouter votre première question</p>
+    </div>
+
+    <!-- Bouton ajouter question -->
+    <div class="animate-fade-in" style="margin: 2rem 0; text-align: center;">
+      <button class="btn-modern btn-secondary-pastel" 
+              type="button" 
+              (click)="addQuestion()" 
+              style="padding: 1rem 2rem; font-size: 1rem;">
+        <i class="bi bi-plus-circle icon-md"></i> Ajouter une question
+      </button>
+    </div>
+
+    <!-- Bouton soumettre -->
+    <div class="animate-fade-in" style="text-align: center; padding-top: 2rem; border-top: 2px solid #D1E9F1; margin-top: 2rem;">
+      <button class="btn-modern btn-success-pastel" 
+              type="submit" 
+              [disabled]="quizForm.invalid"
+              style="padding: 1rem 3rem; font-size: 1.125rem; box-shadow: var(--shadow-lg);">
+        <i class="bi bi-check-circle icon-md"></i> 
+        {{ isEdit ? 'Enregistrer les modifications' : 'Créer le quiz' }}
+      </button>
+      
+      <!-- Message d'aide -->
+      <p *ngIf="quizForm.invalid" 
+         style="margin-top: 1rem; color: #EF4444; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <i class="bi bi-exclamation-triangle icon-sm"></i>
+        Veuillez remplir tous les champs obligatoires
+      </p>
+    </div>
+  </form>
+</div>

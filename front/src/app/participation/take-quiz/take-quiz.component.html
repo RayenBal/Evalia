@@ -1,0 +1,106 @@
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+      <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+<div class="take-quiz-container" *ngIf="quiz; else loadingTpl">
+  <div class="take-quiz-wrapper">
+    <!-- Back Link -->
+    <a class="back-link" [routerLink]="['/announcementPaneliste/details', announceId]">
+      ← Retour à l'annonce
+    </a>
+
+    <!-- Quiz Header -->
+    <div class="quiz-header">
+      <h2 class="quiz-title">{{ quiz?.content || 'Quiz' }}</h2>
+      <p class="quiz-meta" *ngIf="quiz?.questions?.length">
+        {{ quiz.questions.length }} question(s)
+      </p>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="done" class="success-card">
+      <div class="success-icon">✓</div>
+      <p class="success-message">Réponses envoyées. Merci 🙌</p>
+      <a class="btn-back-success" [routerLink]="['/announcementPaneliste/details', announceId]">
+        Retour à l'annonce
+      </a>
+    </div>
+
+    <!-- Quiz Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!done">
+      <div formArrayName="questions">
+        <div *ngFor="let q of quiz.questions; let i = index" [formGroupName]="i" class="question-card">
+          <h5 class="question-number">Q{{ i + 1 }}. {{ q?.content }}</h5>
+
+          <!-- Multiple Choice -->
+          <div formArrayName="choices" class="choices-list">
+            <div *ngFor="let r of q?.responses; let k = index" class="choice-item">
+              <label class="choice-label">
+                <input type="checkbox" [formControl]="getChoice(i, k)" class="choice-checkbox" />
+                <span class="choice-text">{{ r?.content }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Optional Comment -->
+          <div class="comment-section">
+            <label class="comment-label">Commentaire (optionnel)</label>
+            <textarea
+              class="comment-textarea"
+              rows="3"
+              formControlName="freeText"
+              placeholder="Votre remarque..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn-submit" type="submit" [disabled]="submitting || !attemptId">
+          {{ submitting ? 'Envoi en cours…' : 'Valider mes réponses' }}
+        </button>
+        <a class="btn-cancel" [routerLink]="['/announcementPaneliste/details', announceId]"><span>Annuler</span></a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement du quiz…</p>
+  </div>
+</ng-template>

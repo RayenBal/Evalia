@@ -1,0 +1,132 @@
+<!-- ================= NAVBARS (identiques à "Mes réclamations") ================ -->
+
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+        <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+      <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+        <li style="position: relative;">
+          <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+            <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+            <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">3</span>
+          </a>
+        </li>
+        <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+        <li *ngIf="!auth.isPaneliste">
+          <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+            <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+          </a>
+        </li>
+              <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+        <li *ngIf="selectedId">
+          <a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a>
+        </li>
+      </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+
+
+
+<!-- =========================== CONTENU "RÉCOMPENSES" =========================== -->
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem;">
+
+  <!-- Titre + filtre -->
+  <div class="animate-fade-in" style="display:flex; justify-content:space-between; align-items:end; margin-bottom:2rem; gap:1rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size:2.5rem; font-weight:800; margin-bottom:0.5rem;">
+        <i class="bi bi-gift icon-lg" style="margin-right:0.5rem;"></i> Récompenses de mes annonces
+      </h1>
+      <p style="color:#757575; font-size:1.1rem;">Suivez vos gains et mettez à jour le statut des virements</p>
+    </div>
+
+    <!-- bloc filtre (comme ta barre d’action à droite) -->
+    <div class="d-flex align-items-end gap-2">
+      <div>
+        <label class="form-label mb-1">Filtrer par annonce (ID)</label>
+        <input class="form-control" [(ngModel)]="filterAnnId" placeholder="id announcement…">
+      </div>
+      <button class="btn-modern btn-primary-pastel" (click)="load()">
+        <i class="bi bi-search icon-sm"></i> Rechercher
+      </button>
+    </div>
+  </div>
+
+  <hr class="divider-pastel" />
+
+
+
+  <!-- table -->
+  <div *ngIf="rows?.length; else empty" class="table-responsive card-modern animate-scale-in" >
+    <table class="table-modern card-modern animate-scale-in">
+      <thead>
+        <tr>
+          <th style="width:170px;"><i class="bi bi-calendar3 icon-sm"></i> Date</th>
+          <th><i class="bi bi-megaphone icon-sm"></i> Annonce</th>
+          <th style="width:220px;"><i class="bi bi-person icon-sm"></i> Paneliste</th>
+          <th style="width:220px;"><i class="bi bi-envelope icon-sm"></i> Email</th>
+          <th style="width:220px;"><i class="bi bi-bank2 icon-sm"></i> IBAN</th>
+          <th style="width:120px;"><i class="bi bi-tag icon-sm"></i> Type</th>
+          <th style="width:140px; text-align:right;"><i class="bi bi-coin icon-sm"></i> Montant</th>
+          <th style="width:160px; text-align:center;"><i class="bi bi-bag-check icon-sm"></i> Statut</th>
+          <th style="width:1%;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows; let idx = index" class="animate-fade-in" [style.animation-delay]="(idx*50)+'ms'">
+          <td>{{ r.createdAt | date:'short' }}</td>
+          <td>{{ r.announcementName }} <small class="text-muted">({{ r.announcementId }})</small></td>
+          <td>{{ r.panelistFirstname }} {{ r.panelistLastname }}</td>
+          <td><a [href]="'mailto:'+r.panelistEmail">{{ r.panelistEmail }}</a></td>
+<td>
+  <span style="font-family:'Courier New', monospace;">
+    {{ r.panelistIban ? maskIban(r.panelistIban) : '—' }}
+  </span>
+  <button class="btn btn-sm btn-outline-secondary ms-2"
+          (click)="copy(r.panelistIban)"
+          [disabled]="!r.panelistIban">
+    Copier
+  </button>
+</td>
+          <td>{{ r.rewardType }}</td>
+          <td style="text-align:right;">
+            <ng-container [ngSwitch]="r.rewardType">
+              <span *ngSwitchCase="'Points'">{{ r.amount }} pts</span>
+              <span *ngSwitchDefault>{{ r.amount | number:'1.2-2' }} TND</span>
+            </ng-container>
+          </td>
+          <td style="text-align:center;">
+            <select class="form-select form-select-sm" [(ngModel)]="r.status" style="min-width:140px;">
+              <option value="PAS_ENCORE">Pas encore</option>
+              <option value="TRANSFERE">Transférée</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn-modern btn-primary-pastel"
+                    (click)="saveStatus(r)"
+                    [disabled]="savingId === r.earnedRewardId">
+              {{ savingId === r.earnedRewardId ? '...' : 'Enregistrer' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- état vide -->
+  <ng-template #empty>
+    <div style="background:#B3E5FC; color:#01579B; padding:2rem; border-radius:.75rem; text-align:center; margin-bottom:1.5rem;">
+      <i class="bi bi-info-circle icon-md" style="display:block; margin:0 auto 1rem; font-size:2.5rem;"></i>
+      <p style="margin:0;">Aucune récompense pour l’instant.</p>
+    </div>
+  </ng-template>
+</div>

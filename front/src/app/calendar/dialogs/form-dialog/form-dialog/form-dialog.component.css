@@ -1,0 +1,6 @@
+.addContainer { min-width: 420px; }
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.actions { display: flex; gap: 8px; }

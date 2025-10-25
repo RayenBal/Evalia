@@ -1,0 +1,13 @@
+<form [formGroup]="recompensesForm" (ngSubmit)="onSubmit()" class="theme-form">
+  <div class="mb-3">
+    <label for="typeRecompenses">Type de récompense</label>
+    <select formControlName="typeRecompenses" class="form-select">
+      <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+  </button>
+  <button type="button" class="btn btn-secondary ms-2" (click)="goBack()">Annuler</button>
+</form>

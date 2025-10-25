@@ -1,0 +1,92 @@
+<div class="container mt-4" *ngIf="announceForm">
+  <h3>Modifier l'annonce</h3>
+
+  <form [formGroup]="announceForm" (ngSubmit)="onSubmit()">
+    <!-- Infos générales -->
+    <div class="mb-3">
+      <label>Nom de l'annonce</label>
+      <input type="text" class="form-control" formControlName="announceName">
+    </div>
+
+    <div class="mb-3">
+      <label>Contenu</label>
+      <textarea class="form-control" formControlName="content"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label>Adresse du bureau</label>
+      <input type="text" class="form-control" formControlName="officeAddress">
+    </div>
+
+    <div class="mb-3">
+      <label>Adresse de livraison</label>
+      <input type="text" class="form-control" formControlName="deliveryAddress">
+    </div>
+
+    <div class="mb-3">
+      <label>Modes de test</label>
+      <input type="text" class="form-control" formControlName="testModes">
+    </div>
+
+    <!-- Images -->
+    <div class="mb-3">
+      <label>Image principale actuelle</label><br>
+      <img *ngIf="existingMainImageUrl" [src]="existingMainImageUrl" width="150" class="img-thumbnail">
+    </div>
+
+    <div class="mb-3">
+      <label>Nouvelle image principale</label>
+      <input type="file" class="form-control" (change)="onMainImageSelected($event)">
+    </div>
+
+    <div class="mb-3">
+      <label>Images produit actuelles</label>
+      <div class="d-flex flex-wrap">
+        <img *ngFor="let img of existingProductImages" [src]="getImageUrl(img)" width="100" class="me-2 mb-2 img-thumbnail" />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label>Nouvelles images produit</label>
+      <input type="file" class="form-control" multiple (change)="onProductImagesSelected($event)">
+    </div>
+
+    <!-- Quizzes dynamiques -->
+    <div formArrayName="quizList" class="mt-5">
+      <h4>Quizzes</h4>
+      <div *ngFor="let quiz of quizList.controls; let qi = index" [formGroupName]="qi" class="border rounded p-3 mb-3">
+        <label>Titre du quiz {{ qi + 1 }}</label>
+        <input class="form-control mb-2" formControlName="content" placeholder="Titre du quiz" />
+
+        <!-- Questions -->
+        <div formArrayName="questions">
+          <div *ngFor="let question of getQuestions(qi).controls; let qj = index" [formGroupName]="qj" class="border p-2 rounded mb-3 bg-light">
+            <label>Question {{ qj + 1 }}</label>
+            <input class="form-control mb-2" formControlName="content" placeholder="Contenu de la question" />
+
+            <!-- Réponses -->
+            <div formArrayName="responses">
+              <div *ngFor="let response of getResponses(qi, qj).controls; let rk = index" [formGroupName]="rk" class="d-flex align-items-center gap-2 mb-2">
+                <input class="form-control" formControlName="content" placeholder="Réponse proposée" />
+                
+                <button class="btn btn-sm btn-danger" type="button" (click)="removeResponse(qi, qj, rk)">🗑</button>
+              </div>
+              <button class="btn btn-sm btn-outline-primary mt-1" type="button" (click)="addResponse(qi, qj)">+ Réponse</button>
+            </div>
+
+            <button class="btn btn-sm btn-outline-danger mt-2" type="button" (click)="removeQuestion(qi, qj)">🗑 Supprimer Question</button>
+          </div>
+
+          <button class="btn btn-sm btn-outline-success" type="button" (click)="addQuestion(qi)">➕ Ajouter Question</button>
+        </div>
+
+        <button class="btn btn-sm btn-outline-danger mt-3" type="button" (click)="removeQuiz(qi)">🗑 Supprimer Quiz</button>
+      </div>
+
+      <button class="btn btn-outline-success" type="button" (click)="addQuiz()">➕ Ajouter un Quiz</button>
+    </div>
+
+    <!-- Soumission -->
+    <button type="submit" class="btn btn-success mt-4">Mettre à jour</button>
+  </form>
+</div>

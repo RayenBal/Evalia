@@ -1,0 +1,47 @@
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Liste des Quiz</h2>
+
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-primary" routerLink="/add">
+      + Créer un nouveau Quiz
+    </button>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Titre du Quiz</th>
+        <th>Nombre de Questions</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quiz of quizList; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ quiz.content }}</td>
+       <!-- <td>{{ quiz.questions?.length || 0 }}</td>-->
+        <td>{{ quiz.questions.length }}</td>    
+        <td>
+          <!--<button class="btn btn-info btn-sm me-2" [routerLink]="['/quiz/details', quiz.idQuiz]">
+            Détails
+          </button>
+          <button class="btn btn-warning btn-sm me-2" [routerLink]="['/edit', quiz.idQuiz]">
+            Modifier
+          </button>
+          <a class="btn btn-info btn-sm me-2" [routerLink]="['/quiz/details', quiz.idQuiz]">Détails</a>
+            <a class="btn btn-warning btn-sm me-2" [routerLink]="['/edit', quiz.idQuiz]">Modifier</a>-->
+           <button class="btn btn-info btn-sm me-2"(click)="router.navigate(['/quiz/details', quiz.idQuiz])">Détails</button>
+           <button class="btn btn-warning btn-sm me-2" (click)="router.navigate(['/edit', quiz.idQuiz])">Modifier</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteQuiz(quiz.idQuiz!)">
+            Supprimer
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="quizList.length === 0">
+        <td colspan="4" class="text-center">Aucun quiz disponible.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

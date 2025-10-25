@@ -1,0 +1,262 @@
+<!-- ==== NAVBAR ==== -->
+<!-- Si connecté -->
+<ng-container *ngIf="auth.isAuthenticated(); else publicNavbar">
+
+  <!-- Si connecté & annonceur -->
+  
+
+
+  <!-- NAVBAR Paneliste -->
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+      <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+
+</ng-container>
+
+<!-- Si NON connecté -->
+<ng-template #publicNavbar>
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <!-- Logo -->
+      <a routerLink="/" style="text-decoration: none;">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+      <!-- Navigation -->
+      <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+        <li>
+          <a routerLink="/" class="nav-link-modern">
+            <i class="bi bi-house-door" style="margin-right: 0.5rem;"></i> Home
+          </a>
+        </li>
+        <li>
+          <a routerLink="/CategoryList" class="nav-link-modern">
+            <i class="bi bi-folder2-open" style="margin-right: 0.5rem;"></i> Catégories
+          </a>
+        </li>
+        <li>
+          <a routerLink="/announcements" class="nav-link-modern">
+            <i class="bi bi-megaphone" style="margin-right: 0.5rem;"></i> Annonces
+          </a>
+        </li>
+      </ul>
+
+      <!-- Boutons d'authentification -->
+      <div style="display: flex; gap: 0.75rem;">
+        <a routerLink="/login" class="btn-modern btn-outline-pastel">Sign in</a>
+        <a routerLink="/register" class="btn-modern btn-primary-pastel">Sign up</a>
+      </div>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+<div class="container-modern" *ngIf="announce">
+  <!-- En-tête avec animation -->
+  <div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">
+      Détails de l'annonce
+    </h1>
+  </div>
+
+  <!-- Carte principale de l'annonce -->
+  <div class="card-modern animate-scale-in" style="margin-bottom: 2rem;">
+    <!-- Titre et description -->
+    <div style="margin-bottom: 2rem;">
+      <h2 style="color: var(--pastel-blue-600); font-weight: 700; font-size: 2rem; margin-bottom: 1rem;">
+        {{ announce.announceName }}
+      </h2>
+      <p style="color: var(--neutral-700); font-size: 1.1rem; line-height: 1.8;">
+        {{ announce.content }}
+      </p>
+    </div>
+
+    <!-- Adresse -->
+    <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: var(--pastel-blue-50); border-radius: var(--radius-lg); margin-bottom: 2rem;">
+      <i class="bi bi-geo-alt icon-xl icon-blue"></i>
+      <div>
+        <p style="margin: 0; color: var(--neutral-600); font-size: 0.9rem; font-weight: 600;">Adresse du bureau</p>
+        <p style="margin: 0; color: var(--neutral-800); font-size: 1.1rem; font-weight: 500;">{{ announce.officeAddress }}</p>
+      </div>
+    </div>
+
+    <!-- Modes de test -->
+    <div *ngIf="announce.testModes && announce.testModes.length > 0" style="margin-bottom: 2rem;">
+      <h4 style="color: var(--pastel-blue-600); font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-bullseye icon-md icon-blue"></i> Modes de test disponibles
+      </h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+        <span *ngFor="let mode of announce.testModes; let idx = index" 
+              class="badge-pastel animate-scale-in"
+              [class.badge-blue]="idx % 5 === 0"
+              [class.badge-pink]="idx % 5 === 1"
+              [class.badge-mint]="idx % 5 === 2"
+              [class.badge-lavender]="idx % 5 === 3"
+              [class.badge-peach]="idx % 5 === 4"
+              [style.animation-delay]="(idx * 50) + 'ms'">
+          {{ formatTestMode(mode) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Image principale -->
+    <div *ngIf="announce.image" style="margin-bottom: 2rem;">
+      <h4 style="color: var(--pastel-blue-600); font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-image icon-md icon-blue"></i> Image principale
+      </h4>
+      <img [src]="getImageUrl(announce.image)" 
+           class="img-modern" 
+           style="width: 100%; max-width: 500px; max-height: 400px; object-fit: cover; display: block;">
+    </div>
+
+    <!-- Images produit -->
+    <div *ngIf="announce.productImages" style="margin-bottom: 2rem;">
+      <h4 style="color: var(--pastel-blue-600); font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-images icon-md icon-blue"></i> Galerie du produit
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+        <img *ngFor="let img of announce.productImages.split(',')" 
+             [src]="getImageUrl(img)" 
+             class="img-modern" 
+             style="width: 100%; height: 150px; object-fit: cover;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz associés -->
+  <div *ngIf="announce.quizList && announce.quizList.length > 0" class="card-modern animate-fade-in delay-200" style="margin-bottom: 2rem;">
+    <h3 style="color: var(--pastel-blue-600); font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+      <i class="bi bi-question-circle icon-lg icon-blue"></i> Quiz associés
+    </h3>
+
+    <!-- Liste des quiz -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div *ngFor="let quiz of announce.quizList; let qi = index" 
+           class="animate-slide-right"
+           [style.animation-delay]="(qi * 100) + 'ms'"
+           style="padding: 1.5rem; background: var(--gradient-mint); border-radius: var(--radius-lg); border-left: 4px solid var(--pastel-blue-500);">
+        
+        <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+          <div style="flex: 1;">
+            <h5 style="color: var(--neutral-800); font-weight: 600; font-size: 1.25rem; margin-bottom: 0.5rem;">
+              Quiz {{ qi + 1 }} : {{ quiz.content }}
+            </h5>
+          </div>
+          
+          <button class="btn-modern btn-primary-pastel"
+                  [routerLink]="['/take-quiz', announce!.idAnnouncement, getQuizId(quiz)]"
+                  [disabled]="!(auth.isAuthenticated() && auth.isPaneliste)"
+                  [style.opacity]="!(auth.isAuthenticated() && auth.isPaneliste) ? '0.6' : '1'"
+                  [style.cursor]="!(auth.isAuthenticated() && auth.isPaneliste) ? 'not-allowed' : 'pointer'">
+            <i class="bi bi-pencil-square icon-sm"></i> Répondre au quiz
+          </button>
+        </div>
+
+        <small *ngIf="!(auth.isAuthenticated() && auth.isPaneliste)" 
+               style="display: block; margin-top: 0.75rem; color: var(--neutral-600); font-style: italic;">
+          <i class="bi bi-info-circle icon-sm"></i> Connectez-vous en tant que paneliste pour répondre
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aucun quiz -->
+  <div *ngIf="!announce.quizList || announce.quizList.length === 0" 
+       class="card-modern animate-fade-in" 
+       style="text-align: center; padding: 3rem; margin-bottom: 2rem;">
+    <i class="bi bi-question-circle icon-xl icon-blue" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+    <p style="color: var(--neutral-600); font-weight: 500;">Aucun quiz associé à cette annonce.</p>
+  </div>
+
+  <!-- Récompenses -->
+  <div class="card-modern animate-fade-in delay-300" style="margin-bottom: 2rem;">
+    <h3 style="color: var(--pastel-blue-600); font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+      <i class="bi bi-gift icon-lg icon-pink"></i> Récompenses
+    </h3>
+
+    <div *ngIf="announce?.recompensesList?.length; else noRewards">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Montant</th>
+            <th>Libellé</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of announce!.recompensesList; trackBy: trackByRec; let idx = index"
+              class="animate-fade-in"
+              [style.animation-delay]="(idx * 50) + 'ms'">
+            <td>
+              <span class="badge-pastel badge-blue">{{ formatRewardType(r?.typeRecompenses) }}</span>
+            </td>
+            <td style="font-weight: 600; color: var(--pastel-blue-600);">
+              <ng-container [ngSwitch]="r?.typeRecompenses">
+                <span *ngSwitchCase="'Points'"><i class="bi bi-bullseye icon-sm"></i> {{ r?.amount }} pts</span>
+                <span *ngSwitchDefault><i class="bi bi-cash-coin icon-sm"></i> {{ r?.amount }} TND</span>
+              </ng-container>
+            </td>
+            <td style="color: var(--neutral-700);">{{ r?.label || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noRewards>
+      <div style="text-align: center; padding: 2rem;">
+        <i class="bi bi-gift icon-xl icon-pink" style="font-size: 3rem; margin-bottom: 0.75rem; display: block;"></i>
+        <p style="color: var(--neutral-600);">Aucune récompense définie pour cette annonce.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Feedback -->
+  <div class="card-modern animate-fade-in delay-400" style="margin-bottom: 2rem;">
+    <h3 style="color: var(--pastel-blue-600); font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+      <i class="bi bi-chat-left-text icon-lg icon-blue"></i> Laisser un feedback
+    </h3>
+
+    <app-feedback-form
+      *ngIf="auth.isAuthenticated() && auth.isPaneliste"
+      [announcementId]="announce!.idAnnouncement!"
+      (submitted)="refreshAnnounce()">
+    </app-feedback-form>
+
+    <div *ngIf="!(auth.isAuthenticated() && auth.isPaneliste)" 
+         style="text-align: center; padding: 2rem; background: var(--pastel-pink); border-radius: var(--radius-lg);">
+      <i class="bi bi-lock icon-xl" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; color: var(--pastel-blue-600);"></i>
+      <p style="color: var(--neutral-700); font-weight: 500; margin: 0;">
+        Connectez-vous en tant que paneliste pour laisser un feedback.
+      </p>
+    </div>
+  </div>
+
+
+</div>

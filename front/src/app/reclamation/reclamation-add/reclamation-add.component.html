@@ -1,0 +1,133 @@
+<ng-container *ngIf="isAnnonceur; else panelisteNavbar">
+  <!-- NAVBAR Annonceur -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+       <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li *ngIf="selectedId"><a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<ng-template #panelisteNavbar>
+  <!-- NAVBAR Paneliste -->
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/paneliste/home">
+        <img src="assets/logo-evalia.png" alt="EVALIA" style="height: 90px; width: auto;">
+      </a>
+
+      <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/paneliste/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            5
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="auth.isPaneliste"><a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-file-earmark-plus icon-sm"></i> Ajouter une réclamation</a></li>
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/me/rewards" class="nav-link-modern"*ngIf="auth.isAuthenticated() && auth.isPaneliste"><i class="bi bi-gift icon-sm"></i> Mes Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+  <div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+      <i class="bi bi-file-earmark-text icon-lg" style="margin-right: 0.5rem;"></i> {{ isEditMode ? 'Modifier une réclamation' : 'Nouvelle réclamation' }}
+    </h1>
+    <p style="color: #757575; font-size: 1.1rem;">Explique le problème rencontré et choisis le motif.</p>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <form [formGroup]="reclamationForm" (ngSubmit)="onSubmit()" novalidate class="card-modern animate-scale-in">
+    <div style="margin-bottom: 1.5rem;">
+      <label for="content" style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+        <i class="bi bi-chat-left-dots icon-sm"></i> Contenu <span style="color: #FFCCCB;">*</span>
+      </label>
+      <textarea id="content" rows="5" class="input-modern"
+                placeholder="Décris clairement le problème…"
+                formControlName="content"
+                [style.border-color]="reclamationForm.get('content')?.touched && reclamationForm.get('content')?.invalid ? '#EF9A9A' : ''"></textarea>
+      <small *ngIf="reclamationForm.get('content')?.touched && reclamationForm.get('content')?.invalid" style="color: #C62828; display: block; margin-top: 0.5rem;">
+        <i class="bi bi-exclamation-circle icon-sm"></i> Le contenu est requis.
+      </small>
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+      <label for="motif" style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+        <i class="bi bi-tag icon-sm"></i> Motif <span style="color: #FFCCCB;">*</span>
+      </label>
+      <select id="motif" class="input-modern" formControlName="motif"
+              [style.border-color]="reclamationForm.get('motif')?.touched && reclamationForm.get('motif')?.invalid ? '#EF9A9A' : ''">
+        <option value="">— Sélectionner un motif —</option>
+        <option *ngFor="let m of motifOptions" [value]="m">{{ m }}</option>
+      </select>
+      <small *ngIf="reclamationForm.get('motif')?.touched && reclamationForm.get('motif')?.invalid" style="color: #C62828; display: block; margin-top: 0.5rem;">
+        <i class="bi bi-exclamation-circle icon-sm"></i> Merci de choisir un motif.
+      </small>
+    </div>
+
+    <div style="display: flex; gap: 1rem; padding-top: 1rem;">
+      <button type="button" class="btn-modern btn-outline-pastel" (click)="goBack()">
+        <i class="bi bi-arrow-left icon-sm"></i> Retour
+      </button>
+      <button type="submit" class="btn-modern btn-primary-pastel" [disabled]="reclamationForm.invalid" [style.opacity]="reclamationForm.invalid ? '0.6' : '1'" style="margin-left: auto;">
+        <i class="bi bi-send icon-sm" style="margin-right: 0.5rem;"></i>
+        {{ isEditMode ? 'Mettre à jour' : 'Envoyer' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,20 @@
+<div class="container">
+  <h2>Liste des catégories</h2>
+
+  <!-- Message si la liste est vide -->
+  <div *ngIf="categoryList.length === 0">
+    <p>Aucune catégorie trouvée.</p>
+  </div>
+
+  <!-- Liste des catégories -->
+  <ul class="category-list" *ngIf="categoryList.length > 0">
+    <li *ngFor="let category of categoryList">
+      <a
+        [routerLink]="['/categoriesPaneliste', category.idcategory]"
+        class="category-link"
+      >
+        {{ category.nameCategory }}
+      </a>
+    </li>
+  </ul>
+</div>

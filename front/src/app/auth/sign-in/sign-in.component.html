@@ -1,0 +1,153 @@
+<!-- CONTAINER CENTRÉ -->
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #E8F4F8 0%, #D5F5E3 100%); padding: 2rem;">
+
+  <!-- CARTE DE CONNEXION -->
+  <div class="card-modern animate-scale-in" style="max-width: 520px; width: 100%; overflow: hidden;">
+    
+    <!-- EN-TÊTE AVEC DÉGRADÉ -->
+    <div style="padding: 2rem; background: linear-gradient(135deg, #A3D3E3 0%, #47A7C7 100%); text-align: center;">
+      <div class="icon-circle-lg" style="margin: 0 auto 1rem;">
+        <i class="bi bi-shield-lock icon-lg icon-white"></i>
+      </div>
+      <h2 style="color: white; font-weight: 700; margin-bottom: 0.5rem;">Espace sécurisé</h2>
+      <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.95rem;">Authentification en deux étapes</p>
+    </div>
+
+    <!-- CORPS DE LA CARTE -->
+    <div style="padding: 2.5rem;">
+      
+      <!-- TITRE + ÉTAPE -->
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 class="text-gradient" style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Connexion</h1>
+        <p style="color: #757575; margin: 0;" *ngIf="!showOtp">Entrez votre email et votre mot de passe</p>
+        <p style="color: #757575; margin: 0;" *ngIf="showOtp">Saisissez le code de vérification</p>
+
+        <!-- BARRE DE PROGRESSION -->
+        <div style="height: 6px; background: #E0E0E0; border-radius: 9999px; margin-top: 1rem; overflow: hidden;">
+          <div
+            [style.width.%]="showOtp ? 100 : 50"
+            [style.background]="showOtp ? 'linear-gradient(135deg, #D5F5E3 0%, #B8ECD0 100%)' : 'linear-gradient(135deg, #A3D3E3 0%, #47A7C7 100%)'"
+            style="height: 100%; transition: all 400ms ease-in-out;">
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES D'INFORMATION -->
+      <div *ngIf="infoMsg" class="animate-fade-in" style="padding: 1rem; background: #B3E5FC; border-left: 4px solid #81D4FA; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: start; gap: 0.75rem;">
+        <i class="bi bi-info-circle icon-md" style="color: #0288D1;"></i>
+        <div style="color: #424242;">{{ infoMsg }}</div>
+      </div>
+
+      <div *ngIf="errorMsg" class="animate-fade-in" style="padding: 1rem; background: #FFCDD2; border-left: 4px solid #EF9A9A; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: start; gap: 0.75rem;">
+        <i class="bi bi-exclamation-triangle icon-md" style="color: #D32F2F;"></i>
+        <div style="color: #424242;">{{ errorMsg }}</div>
+      </div>
+
+      <!-- ÉTAPE 1 : EMAIL + MOT DE PASSE -->
+      <form [formGroup]="form" (ngSubmit)="submitLogin()" *ngIf="!showOtp" novalidate>
+        
+        <!-- Email -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-envelope" style="margin-right: 0.5rem;"></i> Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="input-modern"
+            placeholder="nom@exemple.com"
+            formControlName="email"
+            [style.border-color]="form.get('email')?.touched && form.get('email')?.invalid ? '#EF9A9A' : '#E0E0E0'" />
+          <small style="color: #EF9A9A; display: block; margin-top: 0.5rem;" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+            <i class="bi bi-exclamation-circle"></i> Veuillez saisir un email valide
+          </small>
+        </div>
+
+        <!-- Mot de passe -->
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem;">
+            <i class="bi bi-lock" style="margin-right: 0.5rem;"></i> Mot de passe
+          </label>
+          <input
+            id="password"
+            type="password"
+            class="input-modern"
+            placeholder="••••••••"
+            formControlName="password"
+            [style.border-color]="form.get('password')?.touched && form.get('password')?.invalid ? '#EF9A9A' : '#E0E0E0'" />
+          <small style="color: #EF9A9A; display: block; margin-top: 0.5rem;" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+            <i class="bi bi-exclamation-circle"></i> Mot de passe requis (min. 8 caractères)
+          </small>
+        </div>
+
+        <div style="text-align: right; margin-bottom: 1.5rem;">
+          <a routerLink="/forgot" style="color: #47A7C7; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <button class="btn-modern btn-primary-pastel" 
+                type="submit"
+                [disabled]="loading || form.invalid"
+                [style.opacity]="(loading || form.invalid) ? 0.6 : 1"
+                style="width: 100%; justify-content: center; font-size: 1.05rem;">
+          <span *ngIf="loading" class="spinner-pastel" style="width: 18px; height: 18px; border-width: 2px; margin-right: 0.5rem;"></span>
+          {{ loading ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <!-- ÉTAPE 2 : OTP -->
+      <form [formGroup]="otpForm" (ngSubmit)="submitOtp()" *ngIf="showOtp" novalidate class="animate-fade-in">
+        <p style="color: #757575; font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center;">
+          <i class="bi bi-envelope-check icon-md icon-blue"></i> Un code à 6 chiffres a été envoyé à votre email
+        </p>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; color: #424242; margin-bottom: 0.5rem; text-align: center;">
+            Code OTP (6 chiffres)
+          </label>
+          <input
+            id="otp"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="6"
+            class="input-modern"
+            style="text-align: center; font-size: 1.5rem; letter-spacing: 0.4em; font-variant-numeric: tabular-nums;"
+            placeholder="000000"
+            formControlName="code" />
+          <small style="display: block; text-align: center; color: #757575; margin-top: 0.5rem;">
+            Entrez le code reçu
+          </small>
+        </div>
+
+        <button class="btn-modern btn-success-pastel" 
+                type="submit"
+                [disabled]="loading || otpForm.invalid"
+                style="width: 100%; justify-content: center; font-size: 1.05rem; margin-bottom: 1rem;">
+          <span *ngIf="loading" class="spinner-pastel" style="width: 18px; height: 18px; border-width: 2px; margin-right: 0.5rem;"></span>
+          <i class="bi bi-check-circle" *ngIf="!loading" style="margin-right: 0.5rem;"></i>
+          {{ loading ? 'Vérification...' : 'Valider le code' }}
+        </button>
+
+        <button type="button"
+                class="btn-modern btn-outline-pastel"
+                (click)="showOtp=false"
+                [disabled]="loading"
+                style="width: 100%; justify-content: center;">
+          <i class="bi bi-arrow-left" style="margin-right: 0.5rem;"></i> Retour
+        </button>
+      </form>
+
+      <!-- DIVIDER + LIEN INSCRIPTION -->
+      <hr class="divider-pastel" style="margin: 2rem 0;">
+      
+      <p style="text-align: center; margin: 0; color: #616161;">
+        Pas de compte ? 
+        <a routerLink="/register" style="color: #47A7C7; text-decoration: none; font-weight: 600; margin-left: 0.25rem;">
+          Créer un compte
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

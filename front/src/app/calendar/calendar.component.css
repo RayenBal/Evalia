@@ -1,0 +1,41 @@
+@media (max-width: 768px) {
+    .filter-container {
+      margin-bottom: 20px; /* Add some space between filters */
+    }
+  
+    .col-md-2 {
+      width: 100%;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  
+    .col-md-10 {
+      width: 100%;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  
+    .card-body {
+      padding: 15px; /* Adjust padding for a more spacious feel */
+    }
+  
+    button.mat-raised-button {
+      width: 100%; /* Full width button for mobile */
+      margin-bottom: 15px; /* Space below the button */
+    }
+  
+    full-calendar {
+      margin-top: 20px; /* Add some space above the calendar */
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .col-md-2 {
+      width: 20%;
+    }
+  
+    .col-md-10 {
+      width: 80%;
+    }
+  }
+  

@@ -1,0 +1,476 @@
+.quiz-edit-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+  padding: 40px 20px;
+}
+
+.quiz-edit-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Page Title - Modern Style
+   ======================================== */
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 35px;
+  text-align: left;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(21, 101, 192, 0.1);
+}
+
+/* ========================================
+   Quiz Title Section
+   ======================================== */
+
+.quiz-title-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(66, 165, 245, 0.15);
+  border: 1px solid rgba(66, 165, 245, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quiz-title-section:hover {
+  box-shadow: 0 8px 30px rgba(66, 165, 245, 0.2);
+}
+
+.section-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quiz-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e3f2fd;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  background: #f5f9ff;
+  color: #1565c0;
+  font-weight: 500;
+}
+
+.quiz-input:focus {
+  border-color: #64b5f6;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   Question Card
+   ======================================== */
+
+.question-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(66, 165, 245, 0.12);
+  border: 1px solid rgba(66, 165, 245, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.question-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(66, 165, 245, 0.2);
+  border-color: rgba(66, 165, 245, 0.2);
+}
+
+/* Question Header */
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.question-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1565c0;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.btn-delete-question {
+  background: white;
+  border: 2px solid #ef5350;
+  color: #ef5350;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(239, 83, 80, 0.1);
+}
+
+.btn-delete-question:hover {
+  background: #ef5350;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 83, 80, 0.35);
+}
+
+/* Question Input */
+.question-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e3f2fd;
+  border-radius: 14px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  background: #f5f9ff;
+  color: #1565c0;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(66, 165, 245, 0.05);
+}
+
+.question-input:focus {
+  border-color: #64b5f6;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.15), 0 4px 12px rgba(66, 165, 245, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   Responses Section
+   ======================================== */
+
+.responses-section {
+  margin-left: 0;
+  margin-top: 15px;
+}
+
+.responses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.responses-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1565c0;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.btn-add-response {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #64b5f6;
+  color: #1565c0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(66, 165, 245, 0.15);
+}
+
+.btn-add-response:hover {
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  color: white;
+  border-color: #1e88e5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(66, 165, 245, 0.35);
+}
+
+/* Response Item */
+.response-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  align-items: center;
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.response-item::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 0;
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  border-radius: 4px;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.response-item:hover::before {
+  height: 70%;
+}
+
+.response-input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid #e3f2fd;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  background: linear-gradient(135deg, #f5f9ff 0%, #fafcfe 100%);
+  color: #1565c0;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(66, 165, 245, 0.05);
+}
+
+.response-input:focus {
+  border-color: #64b5f6;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.12), 0 3px 10px rgba(66, 165, 245, 0.1);
+  transform: translateY(-1px);
+}
+
+.response-input:hover {
+  border-color: #bbdefb;
+  box-shadow: 0 2px 8px rgba(66, 165, 245, 0.08);
+}
+
+.btn-delete-response {
+  background: white;
+  border: 2px solid #ef5350;
+  color: #ef5350;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 50px;
+  box-shadow: 0 2px 8px rgba(239, 83, 80, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.btn-delete-response:hover {
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+  color: white;
+  border-color: #e53935;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(239, 83, 80, 0.35);
+}
+
+/* ========================================
+   Add Question Button
+   ======================================== */
+
+.btn-add-question {
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 25px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(100, 181, 246, 0.3);
+  letter-spacing: 0.3px;
+}
+
+.btn-add-question:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(100, 181, 246, 0.4);
+}
+
+/* ========================================
+   Action Buttons
+   ======================================== */
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.45);
+}
+
+.btn-cancel {
+  background: white;
+  color: #64b5f6;
+  border: 2px solid #64b5f6;
+  padding: 16px 40px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(100, 181, 246, 0.2);
+  letter-spacing: 0.5px;
+}
+
+.btn-cancel:hover {
+  background: #64b5f6;
+  color: white;
+  border-color: #42a5f5;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(100, 181, 246, 0.4);
+}
+
+/* ========================================
+   Loading State
+   ======================================== */
+
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(79, 195, 247, 0.2);
+  border-top-color: #4fc3f7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #546e7a;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+.question-card {
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Fade in animation for response items */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .quiz-edit-container {
+    padding: 20px 15px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .btn-delete-question {
+    width: 100%;
+  }
+
+  .responses-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .response-item {
+    flex-direction: column;
+  }
+
+  .btn-delete-response {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+  }
+}
+
+/* ========================================
+   Input Validation States
+   ======================================== */
+
+.quiz-input.ng-invalid.ng-touched,
+.question-input.ng-invalid.ng-touched,
+.response-input.ng-invalid.ng-touched {
+  border-color: #ef5350;
+}
+
+.quiz-input.ng-valid.ng-touched,
+.question-input.ng-valid.ng-touched,
+.response-input.ng-valid.ng-touched {
+  border-color: #4caf50;
+}

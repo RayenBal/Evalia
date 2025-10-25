@@ -1,0 +1,309 @@
+<!-- NAVBAR MODERNE ANNONCEUR -->
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+  <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+        <!-- Icône de Notification -->
+ 
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <!-- NAVBAR MODERNE ANNONCEUR -->
+  <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/calendar"
+           routerLinkActive="active"
+           class="nav-link-modern">
+          <i class="bi bi-calendar-week icon-sm"></i> Calendrier
+        </a>
+      </li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+
+      <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+
+      <li *ngIf="selectedId"><a [routerLink]="['/owner/announces', selectedId, 'rewards']" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+             <li style="position: relative; display:flex; align-items:center;">
+    <app-notification-bell></app-notification-bell>
+  </li>
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+<!-- CATEGORIES -->
+<section style="background: linear-gradient(135deg, #E8F4F8 0%, #D5F5E3 100%); padding: 2rem 0; border-bottom: 1px solid #E0E0E0;">
+  <div class="container-modern">
+    <div class="animate-fade-in" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <h5 style="margin: 0; font-weight: 700; color: #256F86; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-folder2-open icon-md icon-blue"></i> Catégories :
+      </h5>
+
+      <ng-container *ngIf="categoryList?.length; else catsFallback">
+        <a class="badge-pastel animate-scale-in"
+           [class.badge-blue]="idx % 5 === 0"
+           [class.badge-pink]="idx % 5 === 1"
+           [class.badge-mint]="idx % 5 === 2"
+           [class.badge-lavender]="idx % 5 === 3"
+           [class.badge-peach]="idx % 5 === 4"
+           [style.animation-delay]="(idx * 50) + 'ms'"
+           style="cursor: pointer; text-decoration: none;"
+           *ngFor="let c of categoryList; let idx = index"
+           [routerLink]="['/categories', c.idcategory]">
+          {{ c.nameCategory }}
+        </a>
+      </ng-container>
+
+      <ng-template #catsFallback>
+        <span style="color: #9E9E9E; font-style: italic;">Aucune catégorie.</span>
+      </ng-template>
+    </div>
+  </div>
+</section>
+<!-- CONTENU PRINCIPAL -->
+<div class="container-modern" style="padding-top: 2rem; padding-bottom: 3rem;">
+  
+  <!-- EN-TÊTE -->
+  <div class="animate-fade-in" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+        📢 Mes annonces
+      </h1>
+      <p style="color: #757575; font-size: 1.1rem; margin: 0;">Gérez et suivez toutes vos annonces</p>
+    </div>
+    
+    <a routerLink="/addAnnounce" class="btn-modern btn-primary-pastel" style="text-decoration: none;">
+      <span>➕</span> Nouvelle annonce
+    </a>
+  </div>
+
+  <hr class="divider-pastel" />
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="animate-pulse" style="text-align: center; padding: 4rem;">
+    <div class="spinner-pastel" style="margin: 0 auto;"></div>
+    <p style="color: #757575; margin-top: 1rem; font-weight: 500;">Chargement...</p>
+  </div>
+
+  <!-- ERREUR -->
+  <div *ngIf="!loading && error" class="animate-fade-in" style="padding: 2rem; background: #FFCDD2; border-left: 4px solid #EF9A9A; border-radius: 0.75rem; text-align: center;">
+    <span style="font-size: 3rem; margin-bottom: 1rem; display: block;">⚠️</span>
+    <p style="color: #424242; font-weight: 600; margin: 0;">{{ error }}</p>
+  </div>
+
+  <!-- AUCUNE ANNONCE -->
+  <div *ngIf="!loading && !error && announces.length === 0" 
+       class="animate-scale-in" 
+       style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #D1E9F1 0%, #E6E6FA 100%); border-radius: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <div style="font-size: 4rem; margin-bottom: 1.5rem;">📭</div>
+    <h3 style="color: #256F86; font-weight: 700; margin-bottom: 0.75rem;">Vous n'avez pas encore d'annonces</h3>
+    <p style="color: #616161; margin-bottom: 2rem;">Créez votre première annonce pour commencer</p>
+    <a routerLink="/addAnnounce" class="btn-modern btn-primary-pastel" style="text-decoration: none;">
+      <span>✨</span> Créer une annonce
+    </a>
+  </div>
+
+  <!-- GRILLE DES ANNONCES -->
+  <div class="grid-modern" *ngIf="!loading && !error && announces.length" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+    <div *ngFor="let a of announces; let i = index" 
+         class="card-modern animate-fade-in"
+         [style.animation-delay]="(i * 100) + 'ms'">
+      
+      <!-- IMAGE -->
+      <a [routerLink]="['/announcement/details', a.idAnnouncement]" style="display: block; position: relative; overflow: hidden; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+        <img
+          [src]="img(a.image)"
+          [alt]="a.announceName"
+          class="img-modern"
+          style="width: 100%; height: 200px; object-fit: cover; transition: transform 400ms ease-in-out;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        />
+      </a>
+
+      <!-- CONTENU -->
+      <div style="margin-bottom: 1.5rem;">
+        <h5 style="color: #256F86; font-weight: 700; font-size: 1.25rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {{ a.announceName }}
+        </h5>
+        <p style="color: #616161; line-height: 1.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 1.25rem;">
+          {{ a.content }}
+        </p>
+
+        <!-- STATS ET RÉCOMPENSES -->
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1rem; background: #E8F4F8; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+          <!-- Rating -->
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <ng-container *ngIf="a.idAnnouncement && statsById[a.idAnnouncement!] as s; else noStats">
+              <span style="color: #FFD700; font-size: 1.25rem;">{{ star(s.average) }}</span>
+              <small style="color: #424242; font-weight: 600;">
+                {{ s.average | number:'1.1-2' }} · {{ s.total }} avis
+              </small>
+            </ng-container>
+            <ng-template #noStats>
+              <small style="color: #9E9E9E; font-style: italic;">— aucun avis</small>
+            </ng-template>
+          </div>
+
+          <span style="width: 2px; height: 20px; background: #A3D3E3;"></span>
+
+          <!-- Récompenses -->
+          <div>
+            <ng-container *ngIf="a.idAnnouncement && rewardsById[a.idAnnouncement!] as rw">
+              <ng-container *ngIf="rw.text; else noRw">
+                <span class="badge-pastel badge-mint" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <i class="bi bi-gift icon-sm"></i> {{ rw.text }}
+                </span>
+              </ng-container>
+              <ng-template #noRw>
+                <small style="color: #9E9E9E; font-style: italic;">— aucune récompense</small>
+              </ng-template>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding-top: 1.5rem; border-top: 2px solid #EEEEEE;">
+        <a [routerLink]="['/announcement/details', a.idAnnouncement]" 
+           class="btn-modern btn-primary-pastel"
+           style="font-size: 0.9rem; padding: 0.65rem 1rem; justify-content: center; text-decoration: none;">
+          <i class="bi bi-eye icon-sm"></i> Détails
+        </a>
+
+        <a [routerLink]="['/announcements', a.idAnnouncement, 'feedbacks']" 
+           class="btn-modern btn-success-pastel"
+           style="font-size: 0.9rem; padding: 0.65rem 1rem; justify-content: center; text-decoration: none;">
+          <i class="bi bi-chat-left-text icon-sm"></i> Feedbacks
+        </a>
+
+        <a [routerLink]="['/announcement/update', a.idAnnouncement]" 
+           class="btn-modern btn-warning-pastel"
+           style="font-size: 0.9rem; padding: 0.65rem 1rem; justify-content: center; text-decoration: none;">
+          <i class="bi bi-pencil icon-sm"></i> Modifier
+        </a>
+
+        <button
+          class="btn-modern btn-danger-pastel"
+          (click)="delete(a)"
+          style="font-size: 0.9rem; padding: 0.65rem 1rem; justify-content: center;">
+          <i class="bi bi-trash icon-sm"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background: linear-gradient(135deg, #E8F4F8 0%, #D5F5E3 100%); border-top: 2px solid #A3D3E3; padding: 3rem 0; margin-top: 3rem;">
+  <div class="container-modern">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+      
+      <!-- Section À propos -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-info-circle"></i> À propos d'Evalia
+        </h4>
+        <p style="color: #616161; line-height: 1.6; margin: 0;">
+          Bienvenue sur notre plateforme, un lieu unique de rencontre entre annonceurs et panélistes.
+          Nous avons créé cet espace pour favoriser un dialogue direct et constructif : les annonceurs peuvent présenter leurs produits, services ou campagnes, tandis que les panélistes partagent leurs avis, leurs idées et leurs expériences de manière libre et authentique.
+        </p>
+      </div>
+
+      <!-- Section Contactez-nous -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-envelope"></i> Contactez-nous
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Email -->
+          <a href="mailto:suppevalia@gmail.com" 
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-envelope-fill" style="color: #256F86;"></i>
+            suppevalia&#64;gmail.com
+          </a>
+          
+          <!-- Téléphone -->
+          <a href="tel:+21698143895" 
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-telephone-fill" style="color: #256F86;"></i>
+            +216 98 143 895
+          </a>
+          
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/profile.php?id=61570772838854" 
+             target="_blank"
+             style="color: #616161; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;"
+             onmouseover="this.style.color='#1877F2'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-facebook" style="color: #1877F2;"></i>
+            Page Facebook
+          </a>
+        </div>
+      </div>
+
+      <!-- Section Liens rapides -->
+      <div>
+        <h4 style="color: #256F86; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-link-45deg"></i> Liens rapides
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <a routerLink="/annonceur/home" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-house-door"></i> Accueil
+          </a>
+          <a routerLink="/announces" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-megaphone"></i> Mes Annonces
+          </a>
+          <a routerLink="/addAnnounce" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-plus-circle"></i> Ajouter une annonce
+          </a>
+          <a routerLink="/recompenses" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-gift"></i> Récompenses
+          </a>
+          <a routerLink="/reclamations" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-clipboard-check"></i> Mes Réclamations
+          </a>
+          <a routerLink="/profile" 
+             style="color: #616161; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem;"
+             onmouseover="this.style.color='#256F86'" 
+             onmouseout="this.style.color='#616161'">
+            <i class="bi bi-person"></i> Mon Profil
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ligne de séparation -->
+    <hr style="border: none; border-top: 1px solid rgba(37, 111, 134, 0.2); margin: 2rem 0;">
+
+    <!-- Copyright -->
+    <div style="text-align: center;">
+      <p style="color: #757575; margin: 0; font-size: 0.95rem;">
+        © {{ today | date:'yyyy' }} <span class="text-gradient" style="font-weight: 700;">Evalia</span> — Tous droits réservés
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,81 @@
+<!-- src/app/category/categoryDetail/category-details.component.html -->
+<div class="container">
+  <a routerLink="/CategoryList">&larr; Retour</a>
+
+  <ng-container *ngIf="loading">
+    <p>Chargement...</p>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && error">
+    <p class="error">{{ error }}</p>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && !error && category">
+    <h2>Détails de la catégorie</h2>
+    <div class="card p-3 mb-3">
+      <div><strong>ID :</strong> {{ category.idcategory }}</div>
+      <div><strong>Nom :</strong> {{ category.nameCategory }}</div>
+    </div>
+
+    <h3 class="mt-4">Annonces ({{ announces.length }})</h3>
+
+    <div *ngIf="announces.length === 0" class="alert alert-info">
+      Aucune annonce dans cette catégorie.
+    </div>
+
+    <!-- ==== GRILLE DE CARDS (même style que ta liste globale) ==== -->
+    <div class="row" *ngIf="announces.length > 0">
+      <div class="col-md-4 mb-4" *ngFor="let a of announces">
+        <div class="card h-100 shadow-sm">
+          <a [routerLink]="['/announcementPaneliste/details', a.idAnnouncement]">
+            <img
+              class="card-img-top"
+              [src]="a.image ? getImageUrl(a.image) : 'assets/no-image.png'"
+              [alt]="a.announceName"
+              style="height: 200px; object-fit: cover;"
+            />
+          </a>
+
+          <div class="card-body">
+            <h5 class="card-title mb-1">{{ a.announceName }}</h5>
+            <p class="text-muted small mb-2">
+              <span *ngIf="a.deliveryAddress">Livraison: {{ a.deliveryAddress }}</span>
+              <span *ngIf="a.deliveryAddress && a.officeAddress"> • </span>
+              <span *ngIf="a.officeAddress">Bureau: {{ a.officeAddress }}</span>
+            </p>
+            <p class="card-text text-truncate" style="max-height: 3rem; overflow: hidden;">
+              {{ a.content }}
+            </p>
+          </div>
+
+          <div class="card-footer d-flex justify-content-between">
+            <button
+              [routerLink]="['/announcementPaneliste/details', a.idAnnouncement]"
+              class="btn btn-primary btn-sm"
+            >
+              Voir détails
+            </button>
+            
+               
+             <button
+    class="btn btn-success btn-sm"
+    [routerLink]="['/announcementPaneliste', a.idAnnouncement, 'feedbacks', 'new']">
+    Add Feedback
+  </button>
+  
+             <button
+  class="btn btn-outline-secondary btn-sm"
+  [routerLink]="['/announcements', a.idAnnouncement, 'feedbacks']">
+  Feedbacks
+</button>
+
+            <!-- Optionnels : n’affiche que si tu veux permettre l’édition/suppression ici -->
+            
+           
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- =========================================================== -->
+  </ng-container>
+</div>

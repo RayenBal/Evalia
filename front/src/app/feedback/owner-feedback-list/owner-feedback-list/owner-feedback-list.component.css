@@ -1,0 +1,11 @@
+/* src/app/feedback/owner-feedback-list/owner-feedback-list.component.css */
+.card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+.card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.btn { padding:6px 10px; }
+.stats { display:flex; gap:16px; margin:6px 0 12px; }
+.item { border-top:1px solid #eee; padding:10px 0; }
+.row1 { display:flex; gap:12px; align-items:center; }
+.stars { font-family: system-ui, sans-serif; letter-spacing: 2px; }
+.comment { margin:4px 0; }
+.muted { color:#777; font-style: italic; }
+.back { display:inline-block; margin-top:10px; cursor:pointer; }

@@ -1,0 +1,274 @@
+  <nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+    <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+      <a style="text-decoration: none; cursor: pointer;" routerLink="/annonceur/home">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+      </a>
+
+         <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center; flex-wrap: wrap;">
+      <!-- Icône de Notification -->
+      <li style="position: relative;">
+        <a routerLink="/annonceur/notifications" class="nav-link-modern" style="position: relative; display: inline-block;">
+          <i class="bi bi-bell icon-md" style="font-size: 1.5rem;"></i>
+          <!-- Badge de notification -->
+          <span style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);">
+            3
+          </span>
+        </a>
+      </li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+      <li *ngIf="!auth.isPaneliste">
+        <a routerLink="/reclamations/new" class="nav-link-modern" routerLinkActive="active">
+          <i class="bi bi-file-earmark-text icon-sm"></i> Ajouter une réclamation
+        </a>
+        
+      </li>
+            <li><a routerLink="/reclamations" class="nav-link-modern"><i class="bi bi-clipboard-check icon-sm"></i> Mes Réclamations</a></li>
+
+      <li><a routerLink="/announcements" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Les Annonces</a></li>
+      <li ><a  class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+    </ul>
+
+      <button class="btn-modern btn-danger-pastel" (click)="logout()">
+        <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+      </button>
+    </div>
+  </nav>
+
+
+<div class="container-modern" style="padding: 2rem 1rem; min-height: 100vh;">
+  
+  <!-- En-tête -->
+  <div class="card-modern animate-fade-in" style="padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="text-gradient" style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="bi bi-pencil-square icon-lg"></i>
+        Modifier l'annonce
+      </h1>
+      <p style="color: #6B7280; margin: 0;">Mettez à jour les informations de votre annonce</p>
+    </div>
+    <a class="btn-modern btn-secondary-pastel" routerLink="/addAnnounce">
+      <i class="bi bi-plus-circle icon-sm"></i> Nouvelle annonce
+    </a>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="announceForm" (ngSubmit)="onSubmit()">
+    
+    <!-- Informations de base -->
+    <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;">
+      <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-info-circle icon-md"></i>
+        Informations principales
+      </h2>
+
+      <div style="display: grid; gap: 1.5rem;">
+        <!-- Nom -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi bi-tag icon-sm"></i> Nom de l'annonce
+          </label>
+          <input class="input-modern" formControlName="announceName" placeholder="Ex: Test de shampooing" />
+        </div>
+
+        <!-- Contenu -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi bi-card-text icon-sm"></i> Description
+          </label>
+          <textarea class="input-modern" formControlName="content" rows="4" placeholder="Décrivez votre annonce en détail..." style="resize: vertical;"></textarea>
+        </div>
+
+        <!-- Adresses -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+          <div>
+            <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-building icon-sm"></i> Adresse du bureau
+            </label>
+            <input class="input-modern" formControlName="officeAddress" placeholder="Adresse complète" />
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-truck icon-sm"></i> Adresse de livraison
+            </label>
+            <input class="input-modern" formControlName="deliveryAddress" placeholder="Adresse de livraison" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images -->
+    <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;">
+      <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-images icon-md"></i>
+        Images
+      </h2>
+
+      <!-- Image principale actuelle -->
+      <div *ngIf="currentMainImage" style="margin-bottom: 2rem;">
+        <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 1rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-image icon-sm"></i> Image principale actuelle
+        </label>
+        <img [src]="getImageUrl(currentMainImage)" alt="Image principale" class="img-modern" style="max-width: 300px; box-shadow: var(--shadow-lg);" />
+      </div>
+
+      <!-- Remplacer image principale -->
+      <div style="margin-bottom: 2rem;">
+        <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 1rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-arrow-repeat icon-sm"></i> Remplacer l'image principale
+          <span class="badge-pastel badge-gray" style="font-size: 11px; padding: 0.25rem 0.75rem;">Optionnel</span>
+        </label>
+        <div class="file-upload-modern">
+          <input type="file" (change)="onMainImageSelected($event)" accept="image/*" />
+          <div class="file-upload-border">
+            <i class="bi bi-cloud-upload icon-xl" style="color: #47A7C7;"></i>
+            <div>
+              <p style="font-weight: 600; color: #256F86; margin: 0;">Cliquez pour choisir une nouvelle image</p>
+              <p style="font-size: 0.875rem; color: #6B7280; margin: 0;">ou laissez vide pour conserver l'actuelle</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Images produits actuelles -->
+      <div *ngIf="currentProductImages.length" style="margin-bottom: 2rem;">
+        <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 1rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-images icon-sm"></i> Images produits actuelles
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+          <img *ngFor="let img of currentProductImages" [src]="getImageUrl(img)" [alt]="img" class="img-modern" style="width: 100%; height: 150px; object-fit: cover;" />
+        </div>
+      </div>
+
+      <!-- Ajouter images produits -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 1rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-plus-circle icon-sm"></i> Ajouter / remplacer des images produits
+          <span class="badge-pastel badge-gray" style="font-size: 11px; padding: 0.25rem 0.75rem;">Optionnel</span>
+        </label>
+        <div class="file-upload-modern">
+          <input type="file" multiple (change)="onProductImagesSelected($event)" accept="image/*" />
+          <div class="file-upload-border">
+            <i class="bi bi-images icon-xl" style="color: #47A7C7;"></i>
+            <div>
+              <p style="font-weight: 600; color: #256F86; margin: 0;">Sélectionnez plusieurs images</p>
+              <p style="font-size: 0.875rem; color: #6B7280; margin: 0;">ou laissez vide pour conserver les actuelles</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;" *ngIf="announce">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-question-circle icon-md"></i>
+          Quiz
+        </h2>
+        <a class="btn-modern btn-secondary-pastel" [routerLink]="['/add']" [queryParams]="{ announceId: announceId }" style="font-size: 0.875rem;">
+          <i class="bi bi-plus-circle icon-sm"></i> Ajouter un quiz
+        </a>
+      </div>
+
+      <div *ngIf="announce?.quizList?.length; else noQuiz" style="display: grid; gap: 1rem;">
+        <div *ngFor="let q of announce!.quizList; trackBy: trackByQuiz" class="card-modern" style="padding: 1.5rem; border-left: 4px solid #47A7C7;">
+          <div style="margin-bottom: 1rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: #1C5364; margin: 0;">{{ q?.content || 'Quiz sans titre' }}</h3>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a class="btn-modern btn-warning-pastel" [routerLink]="['/quiz/edit', getQuizId(q)]" [queryParams]="{ announceId: announceId }" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+              <i class="bi bi-pencil icon-sm"></i> Modifier
+            </a>
+            <button type="button" class="btn-modern btn-danger-pastel" (click)="deleteQuiz(getQuizId(q))" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+              <i class="bi bi-trash icon-sm"></i> Supprimer
+            </button>
+            <a class="btn-modern btn-outline-pastel" [routerLink]="['/quiz/details', getQuizId(q)]" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+              <i class="bi bi-eye icon-sm"></i> Voir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noQuiz>
+        <div style="padding: 2rem; text-align: center; background: linear-gradient(135deg, #E8F4F8 0%, #D1E9F1 100%); border-radius: var(--radius-lg);">
+          <i class="bi bi-inbox icon-xl" style="color: #47A7C7; display: block; margin-bottom: 0.75rem;"></i>
+          <p style="color: #6B7280; margin: 0;">Aucun quiz associé à cette annonce</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Récompenses -->
+    <div class="card-modern animate-scale-in" style="padding: 2rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="text-gradient" style="font-size: 1.5rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-gift icon-md"></i>
+          Récompenses
+        </h2>
+        <button type="button" class="btn-modern btn-secondary-pastel" (click)="addRewardRow()" style="font-size: 0.875rem;">
+          <i class="bi bi-plus-circle icon-sm"></i> Ajouter
+        </button>
+      </div>
+
+      <div formArrayName="recompensesList" style="display: grid; gap: 1.5rem;">
+        <div *ngFor="let r of rewards.controls; let i = index" [formGroupName]="i" class="card-modern" style="padding: 1.5rem; border-left: 4px solid #6EE7B7;">
+          <input type="hidden" formControlName="idRecompense" />
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1rem;">
+            <!-- Type -->
+            <div>
+              <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="bi bi-tag icon-sm"></i> Type
+              </label>
+              <select class="input-modern" formControlName="typeRecompenses" style="cursor: pointer;">
+                <option [ngValue]="null" disabled>— Sélectionner —</option>
+                <option [ngValue]="'Points'">Points</option>
+                <option [ngValue]="'Argent'">Argent (TND)</option>
+                <option [ngValue]="'BonsDachats'">Bons d'achats</option>
+              </select>
+            </div>
+
+            <!-- Montant -->
+            <div>
+              <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="bi bi-cash-coin icon-sm"></i> Montant
+              </label>
+              <input type="number" class="input-modern" formControlName="amount" placeholder="Ex: 100" />
+            </div>
+
+            <!-- Libellé -->
+            <div>
+              <label style="display: block; font-weight: 600; color: #256F86; margin-bottom: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="bi bi-card-text icon-sm"></i> Libellé
+                <span class="badge-pastel badge-gray" style="font-size: 11px; padding: 0.25rem 0.75rem;">Optionnel</span>
+              </label>
+              <input class="input-modern" formControlName="label" placeholder="Description de la récompense" />
+            </div>
+          </div>
+
+          <!-- Bouton supprimer -->
+          <button type="button" class="btn-modern btn-danger-pastel" (click)="removeRewardRow(i)" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            <i class="bi bi-trash icon-sm"></i> Supprimer cette récompense
+          </button>
+
+          <!-- Erreur -->
+          <div *ngIf="getRowError(i)" style="margin-top: 1rem; padding: 1rem; background: #FFEBEE; border-radius: var(--radius-md); border-left: 4px solid #EF4444;">
+            <p style="color: #DC2626; margin: 0; font-size: 0.875rem; font-weight: 500;">
+              <i class="bi bi-exclamation-triangle icon-sm"></i> {{ getRowError(i) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="animate-fade-in" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <button type="submit" class="btn-modern btn-success-pastel" style="padding: 0.875rem 2rem;">
+        <i class="bi bi-check-circle icon-md"></i> Mettre à jour
+      </button>
+      <button type="button" class="btn-modern btn-outline-pastel" (click)="onCancel()" style="padding: 0.875rem 2rem;">
+        <i class="bi bi-x-circle icon-md"></i> Annuler
+      </button>
+    </div>
+  </form>
+</div>

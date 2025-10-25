@@ -1,0 +1,61 @@
+<div class="card p-3">
+  <h5 class="mb-3">Votre feedback</h5>
+
+  <!-- Pas connecté en paneliste -->
+  <div *ngIf="!(auth.isAuthenticated() && auth.isPaneliste)" class="alert alert-warning py-2">
+    Connectez-vous en tant que paneliste pour laisser ou modifier votre feedback.
+  </div>
+
+  <!-- Mode LECTURE -->
+  <ng-container *ngIf="auth.isAuthenticated() && auth.isPaneliste && existing && !editing">
+    <div class="mb-2">
+      <div class="rating">{{ stars }}</div>
+      <div class="text-muted small">Note : {{ existing.rating ?? '—' }}</div>
+    </div>
+
+    <div class="mb-2">
+      <div class="fw-bold">Commentaire</div>
+      <div class="preline">{{ existing.comment || '—' }}</div>
+    </div>
+
+    <div class="text-muted small mb-3">
+      Créé le : {{ existing.createdAt | date:'short' }}
+    </div>
+
+    <button class="btn btn-outline-primary" (click)="enterEdit()">Modifier</button>
+  </ng-container>
+
+  <!-- Mode ÉDITION (création ou mise à jour) -->
+  <form *ngIf="auth.isAuthenticated() && auth.isPaneliste && editing" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label class="form-label fw-bold">Note</label>
+      <div class="d-flex gap-3 align-items-center flex-wrap">
+        <label *ngFor="let r of ratings" class="form-check m-0 d-flex align-items-center gap-1">
+          <input type="radio" class="form-check-input" [value]="r" formControlName="rating">
+          <span>{{ r }}</span>
+        </label>
+      </div>
+      <small class="text-muted">1 = très insatisfait, 5 = très satisfait</small>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold">Commentaire</label>
+      <textarea class="form-control" rows="4" formControlName="comment"
+                placeholder="Décrivez votre expérience..."></textarea>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="submit" [disabled]="loading || !canSubmit">
+        {{ loading ? 'Enregistrement…' : (existing ? 'Mettre à jour' : 'Soumettre') }}
+      </button>
+      <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()" *ngIf="existing">
+        Annuler
+      </button>
+    </div>
+  </form>
+
+  <!-- Aucun feedback et non paneliste -->
+  <div *ngIf="auth.isAuthenticated() && auth.isPaneliste && !existing && !editing" class="text-muted">
+    Aucun feedback encore. <button class="btn btn-link p-0" (click)="enterEdit()">Créer un feedback</button>
+  </div>
+</div>

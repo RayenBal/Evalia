@@ -1,0 +1,4 @@
+.card { border: 1px solid #e5e7eb; border-radius: .75rem; }
+
+.preline { white-space: pre-line; }
+.rating { font-size: 1.25rem; line-height: 1; } /* ★/☆ affichage */

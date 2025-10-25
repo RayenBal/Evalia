@@ -1,0 +1,41 @@
+<!-- src/app/feedback/components/feedback-list/feedback-list.component.html -->
+
+<!-- NAVBAR MODERNE ANNONCEUR -->
+<nav style="background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+  <div class="container-modern" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
+    <a routerLink="/annonceur/home" style="text-decoration: none; cursor: pointer;">
+      <img src="assets/logo-annonceur.png" alt="EVALIA Annonceur" style="height: 90px; width: auto;">
+    </a>
+
+    <ul style="display: flex; list-style: none; gap: 2rem; margin: 0; align-items: center;">
+      <li><a routerLink="/announces" class="nav-link-modern"><i class="bi bi-megaphone icon-sm"></i> Mes Annonces</a></li>
+      <li><a routerLink="/announces" class="nav-link-modern" routerLinkActive="active"><i class="bi bi-chat-left-text icon-sm"></i> Les feedbacks</a></li>
+      <li><a routerLink="/recompenses" class="nav-link-modern"><i class="bi bi-gift icon-sm"></i> Récompenses</a></li>
+      <li><a routerLink="/profile" class="nav-link-modern"><i class="bi bi-person icon-sm"></i> Mon profil</a></li>
+    </ul>
+
+    <button class="btn-modern btn-danger-pastel" (click)="logout()">
+      <i class="bi bi-box-arrow-right icon-sm"></i> Déconnexion
+    </button>
+  </div>
+</nav>
+
+
+
+
+<div class="container mt-4">
+  <a [routerLink]="['/announcement/details', id]">&larr; Retour</a>
+  <h3 class="mt-3">Feedbacks de l’annonce</h3>
+
+  <div *ngIf="loading">Chargement…</div>
+  <div *ngIf="!loading && items.length === 0" class="text-muted">Aucun feedback.</div>
+
+  <div *ngFor="let f of items" class="border rounded p-3 mb-2">
+    <div class="d-flex justify-content-between">
+      <strong>#{{ f.idFeedback }}</strong>
+      <small class="text-muted">{{ f.createdAt | date:'short' }}</small>
+    </div>
+    <div *ngIf="f.rating != null"><strong>Note :</strong> {{ f.rating }}/5</div>
+    <div *ngIf="f.comment"><strong>Commentaire :</strong> {{ f.comment }}</div>
+  </div>
+</div>
