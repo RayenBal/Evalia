@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un Administrateur - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .role-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .role-checkbox-item {
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .role-checkbox-item:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+            transform: translateX(4px);
+        }
+        .role-checkbox-item input[type="checkbox"]:checked ~ label {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        .role-checkbox-item input[type="checkbox"]:checked ~ .role-checkbox-content {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+        .password-strength {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-user-plus text-gradient"></i> Ajouter un Administrateur</h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-secondary-modern" th:href="@{/admin/list}">
+                <i class="fas fa-arrow-left"></i> Liste des Admins
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <div>
+                            <h2><i class="fas fa-user-shield"></i> Nouvel Administrateur</h2>
+                            <p class="card-subtitle">Créez un nouveau compte administrateur avec rôles et permissions</p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/admin/register}" th:object="${admin}" method="post" class="form-modern">
+                        
+                        <!-- Informations Personnelles -->
+                        <div class="section-title">
+                            <i class="fas fa-user-circle"></i> Informations Personnelles
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="firstname" class="form-label-modern">
+                                        <i class="fas fa-user"></i> Prénom
+                                    </label>
+                                    <input type="text" 
+                                           th:field="*{firstname}" 
+                                           class="form-control-modern" 
+                                           id="firstname" 
+                                           placeholder="Ex: Yosra"
+                                           required>
+                                    <div class="form-helper-text">
+                                        Le prénom de l'administrateur
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="lastname" class="form-label-modern">
+                                        <i class="fas fa-user"></i> Nom
+                                    </label>
+                                    <input type="text" 
+                                           th:field="*{lastname}" 
+                                           class="form-control-modern" 
+                                           id="lastname" 
+                                           placeholder="Ex: Shil"
+                                           required>
+                                    <div class="form-helper-text">
+                                        Le nom de famille de l'administrateur
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label for="email" class="form-label-modern">
+                                <i class="fas fa-envelope"></i> Adresse Email
+                            </label>
+                            <input type="email" 
+                                   th:field="*{email}" 
+                                   class="form-control-modern" 
+                                   id="email" 
+                                   placeholder="admin@evalia.com"
+                                   required>
+                            <div class="form-helper-text">
+                                Cette adresse sera utilisée pour la connexion
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Sécurité -->
+                        <div class="section-title">
+                            <i class="fas fa-lock"></i> Sécurité & Authentification
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="password" class="form-label-modern">
+                                        <i class="fas fa-key"></i> Mot de passe
+                                    </label>
+                                    <input type="password" 
+                                           th:field="*{password}" 
+                                           class="form-control-modern" 
+                                           id="password" 
+                                           placeholder="••••••••"
+                                           required>
+                                    <div class="password-strength">
+                                        <div class="password-strength-bar" id="strengthBar"></div>
+                                    </div>
+                                    <div class="form-helper-text" id="strengthText">
+                                        Minimum 8 caractères, majuscules, minuscules et chiffres
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="confirmPassword" class="form-label-modern">
+                                        <i class="fas fa-check-circle"></i> Confirmer le mot de passe
+                                    </label>
+                                    <input type="password" 
+                                           th:field="*{confirmPassword}" 
+                                           class="form-control-modern" 
+                                           id="confirmPassword" 
+                                           placeholder="••••••••"
+                                           required>
+                                    <div class="form-helper-text" id="matchText">
+                                        Ressaisissez le même mot de passe
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Rôles et Permissions -->
+                        <div class="section-title">
+                            <i class="fas fa-shield-alt"></i> Rôles et Permissions
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                <i class="fas fa-user-tag"></i> Assigner des Rôles
+                            </label>
+                            
+                            <div th:if="${#lists.isEmpty(rolesList)}" class="alert-modern alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Aucun rôle disponible. Créez des rôles d'abord.
+                            </div>
+
+                            <div th:unless="${#lists.isEmpty(rolesList)}" class="role-checkbox-group">
+                                <div class="role-checkbox-item" th:each="role : ${rolesList}">
+                                    <div style="display: flex; align-items: start; gap: 12px;">
+                                        <input class="form-check-input" 
+                                               type="checkbox"
+                                               th:field="*{roles}"
+                                               th:value="${role.idrole}"
+                                               th:id="'role_' + ${role.idrole}"
+                                               style="margin-top: 4px; cursor: pointer;">
+                                        <div class="role-checkbox-content" style="flex: 1;">
+                                            <label class="form-check-label" 
+                                                   th:for="'role_' + ${role.idrole}"
+                                                   style="cursor: pointer; display: block;">
+                                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                                    <i class="fas fa-shield-alt" 
+                                                       th:style="${role.nameRole == 'SUPER_ADMIN'} ? 'color: #ef4444;' : 'color: #3b82f6;'"></i>
+                                                    <strong th:text="${role.nameRole}" 
+                                                            th:style="${role.nameRole == 'SUPER_ADMIN'} ? 'color: #ef4444;' : ''">ROLE_NAME</strong>
+                                                </div>
+                                                <small class="text-secondary" 
+                                                       th:text="${role.description}"
+                                                       style="font-size: 12px;">Description</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${#fields.hasErrors('roles')}" class="alert-modern alert-danger" style="margin-top: 16px;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span th:errors="*{roles}"></span>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Actions -->
+                        <div class="btn-group-modern" style="justify-content: flex-end;">
+                            <a th:href="@{/admin/list}" class="btn-modern btn-secondary-modern">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-user-plus"></i> Créer l'Administrateur
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Password strength checker
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const matchText = document.getElementById('matchText');
+
+    passwordInput?.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[a-z]/)) strength += 25;
+        if (password.match(/[A-Z]/)) strength += 25;
+        if (password.match(/[0-9]/)) strength += 25;
+        
+        strengthBar.style.width = strength + '%';
+        
+        if (strength <= 25) {
+            strengthBar.style.background = '#ef4444';
+            strengthText.textContent = 'Mot de passe faible';
+            strengthText.style.color = '#ef4444';
+        } else if (strength <= 50) {
+            strengthBar.style.background = '#f59e0b';
+            strengthText.textContent = 'Mot de passe moyen';
+            strengthText.style.color = '#f59e0b';
+        } else if (strength <= 75) {
+            strengthBar.style.background = '#3b82f6';
+            strengthText.textContent = 'Mot de passe bon';
+            strengthText.style.color = '#3b82f6';
+        } else {
+            strengthBar.style.background = '#10b981';
+            strengthText.textContent = 'Mot de passe fort';
+            strengthText.style.color = '#10b981';
+        }
+    });
+
+    // Password match checker
+    confirmInput?.addEventListener('input', function() {
+        if (this.value === passwordInput.value && this.value.length > 0) {
+            matchText.textContent = '✓ Les mots de passe correspondent';
+            matchText.style.color = '#10b981';
+        } else if (this.value.length > 0) {
+            matchText.textContent = '✗ Les mots de passe ne correspondent pas';
+            matchText.style.color = '#ef4444';
+        } else {
+            matchText.textContent = 'Ressaisissez le même mot de passe';
+            matchText.style.color = '#64748b';
+        }
+    });
+</script>
+</body>
+</html>

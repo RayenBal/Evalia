@@ -1,0 +1,76 @@
+<!-- file: EvaliaBackOffice/src/main/resources/templates/reclamations/list.html -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Réclamations - Evalia BackOffice</title>
+
+    <!-- mêmes imports que register -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Sidebar identique -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<!-- Même wrapper que register pour décaler le contenu à droite de la sidebar -->
+<main class="page-with-sidebar fade-in">
+
+    <!-- Top bar comme sur register -->
+    <div class="top-bar">
+        <h1>
+            <i class="fas fa-clipboard-list text-gradient"></i>
+            Réclamations
+        </h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-secondary-modern" th:href="@{/bo/reclamations/stats}">
+                <i class="fas fa-chart-line"></i> Stats Réclamations
+            </a>
+        </div>
+    </div>
+
+    <!-- Conteneur modern -->
+    <div class="container-modern">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <div>
+                    <h2><i class="fas fa-list-ul"></i> Liste des Réclamations</h2>
+                    <p class="card-subtitle">Vue d’ensemble des réclamations reçues</p>
+                </div>
+            </div>
+
+            <div class="card-body-modern table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width:60px">#</th>
+                        <th style="width:130px">Créée le</th>
+                        <th style="width:190px">Motif</th>
+                        <th>Contenu</th>
+                        <th style="width:220px">Utilisateur</th>
+                        <th style="width:140px">Type</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r, i : ${items}">
+                        <td th:text="${i.index + 1}">1</td>
+                        <td th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd/MM/yyyy') : ''}">--/--/----</td>
+                        <td th:text="${r.motif}">Motif</td>
+                        <td th:text="${r.content}">Contenu</td>
+                        <td th:text="${r.userFullName != null ? r.userFullName : '—'}">Utilisateur</td>
+                        <td th:text="${r.userType}">Paneliste</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

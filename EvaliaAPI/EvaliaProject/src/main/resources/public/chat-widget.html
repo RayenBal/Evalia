@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Evalia Chat Widget</title>
+<style>
+  #chatButton {
+    position: fixed; bottom: 20px; right: 20px;
+    background-color: #4A90E2; color: white;
+    border: none; border-radius: 50%;
+    width: 60px; height: 60px; font-size: 26px;
+    cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  #chatPopup {
+    position: fixed; bottom: 90px; right: 20px;
+    width: 320px; height: 420px;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    display: none; flex-direction: column;
+    overflow: hidden; font-family: Arial, sans-serif;
+  }
+
+  #chatMessages {
+    flex: 1; overflow-y: auto; padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .msg { margin: 6px 0; line-height: 1.4; }
+  .user { text-align: right; color: #4A90E2; }
+  .bot { text-align: left; color: #333; }
+
+  #chatInput {
+    display: flex; border-top: 1px solid #ddd;
+  }
+
+  #chatInput input {
+    flex: 1; padding: 10px; border: none; outline: none;
+  }
+
+  #chatInput button {
+    background: #4A90E2; border: none; color: white;
+    padding: 0 15px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<button id="chatButton">💬</button>
+
+<div id="chatPopup">
+  <div id="chatMessages"></div>
+  <div id="chatInput">
+    <input id="userMsg" type="text" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+const popup = document.getElementById("chatPopup");
+const btn = document.getElementById("chatButton");
+const chat = document.getElementById("chatMessages");
+
+btn.onclick = () => {
+  popup.style.display = popup.style.display === "flex" ? "none" : "flex";
+};
+
+async function sendMessage() {
+  const input = document.getElementById("userMsg");
+  const text = input.value.trim();
+  if (!text) return;
+  chat.innerHTML += `<div class='msg user'><b>You:</b> ${text}</div>`;
+  input.value = '';
+
+  const body = { messages: [{ role: 'user', content: text }] };
+  try {
+    const res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    chat.innerHTML += `<div class='msg bot'><b>Evalia:</b> ${data.content}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  } catch (err) {
+    chat.innerHTML += `<div class='msg bot'><b>Error:</b> Connection issue.</div>`;
+  }
+}
+</script>
+
+</body>
+</html>
+

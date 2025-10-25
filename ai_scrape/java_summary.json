@@ -1,0 +1,4473 @@
+[
+  {
+    "path": "java/com/example/evaliaproject/EvaliaProjectApplication.java",
+    "classes": [
+      {
+        "name": "EvaliaProjectApplication",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/ai/MistralConfig.java",
+    "classes": [
+      {
+        "name": "MistralConfig",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "baseUrl"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "apiKey"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/ai/ChatController.java",
+    "classes": [
+      {
+        "name": "ChatController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/ai"
+        ],
+        "pos": 449
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/chat"
+        ],
+        "pos": 801
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final WebClient",
+        "name": "mistral"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "model"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/QuizService.java",
+    "classes": [
+      {
+        "name": "QuizService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/ICategoryService.java",
+    "classes": [
+      {
+        "name": "ICategoryService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/INotificationService.java",
+    "classes": [
+      {
+        "name": "INotificationService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/ResponsePanelisteService.java",
+    "classes": [
+      {
+        "name": "ResponsePanelisteService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "ResponsePanelisteRepository",
+        "name": "responsePanelisteRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/NotificationService.java",
+    "classes": [
+      {
+        "name": "NotificationService",
+        "type": "class",
+        "javadoc": "/**\n * Service applicatif pour créer/lire/mettre à jour les notifications.\n */\n@Service\n@RequiredArgsConstructor\npublic class NotificationService implements INotificationService {\n\n    private final NotificationRepository repo;\n    private final ApplicationEventPublisher events;\n    private final NotificationStreamService streamService;\n\n    /** Event interne pour déclencher le push SSE après commit. */\n    public record NotificationCreatedEvent(Notification notif) {}\n\n    @Transactional\n    public void notify(User recipient, Announce ann, String message, NotificationType type) {\n        Notification n = Notification.builder()\n                .recipient(recipient)\n                .announcement(ann)\n                .type(type)\n                .message(message)\n                .seen(false)\n                .build();\n        n = repo.save(n);\n        events.publishEvent(new NotificationCreatedEvent(n)); // push sera AFTER_COMMIT\n    }\n\n    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)\n    public void onCreated(NotificationCreatedEvent ev) {\n        Notification n = ev.notif();\n        NotificationDto dto = NotificationMapper.toDto(n);\n        Long uid = n.getRecipient().getId_user();\n        streamService.push(dto, uid);\n    }\n\n    @Transactional(readOnly = true)\n    public List<Notification> listForUser(Long userId) {\n        return repo.findByRecipientOrderByCreatedAtDesc(userId);\n    }\n\n    @Transactional\n    public void markSeen(String id) {\n        var n = repo.findById(id).orElseThrow();\n        n.setSeen(true);\n        repo.save(n);\n    }\n\n    @Transactional\n    public void markAllSeen(Long userId) {\n        var list = repo.findByRecipientOrderByCreatedAtDesc(userId);\n        for (var n : list) if (!n.isSeen()) n.setSeen(true);\n        repo.saveAll(list);\n    }\n\n    @Transactional(readOnly = true)\n    public long unseenCount(Long userId) {\n        return repo.countUnseen(userId);\n    }\n\n}\n\n//    private final NotificationRepository repo;\n//    @Autowired\n//    private NotificationStreamService streamService; // 👈 SSE\n//\n//    /**\n//     * Crée et persiste une notification, puis la pousse en SSE\n//     * uniquement après COMMIT pour éviter les \"fantômes\".\n//     */"
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final NotificationRepository",
+        "name": "repo"
+      },
+      {
+        "visibility": "private",
+        "type": "final ApplicationEventPublisher",
+        "name": "events"
+      },
+      {
+        "visibility": "private",
+        "type": "final NotificationStreamService",
+        "name": "streamService"
+      },
+      {
+        "visibility": "private",
+        "type": "final NotificationRepository",
+        "name": "repo"
+      },
+      {
+        "visibility": "private",
+        "type": "NotificationStreamService",
+        "name": "streamService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/RecompensesService.java",
+    "classes": [
+      {
+        "name": "RecompensesService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IQuestionService.java",
+    "classes": [
+      {
+        "name": "IQuestionService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/QuestionService.java",
+    "classes": [
+      {
+        "name": "QuestionService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "QuestionRepository",
+        "name": "questionRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/PlanningService.java",
+    "classes": [
+      {
+        "name": "PlanningService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final PlanningRepository",
+        "name": "repo"
+      },
+      {
+        "visibility": "private",
+        "type": "final AnnouncementRepository",
+        "name": "announcementRepo"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepo"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepo"
+      },
+      {
+        "visibility": "private",
+        "type": "final NotificationService",
+        "name": "notificationService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IResponsePanelisteService.java",
+    "classes": [
+      {
+        "name": "IResponsePanelisteService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/NotificationStreamService.java",
+    "classes": [
+      {
+        "name": "NotificationStreamService",
+        "type": "class",
+        "javadoc": "/**\n * Gère les connexions SSE par utilisateur et l'envoi\n * de notifications aux clients connectés.\n */\n@Service\npublic class NotificationStreamService {\n\n\n\n\n    private final ConcurrentMap<Long, CopyOnWriteArraySet<SseEmitter>> emitters = new ConcurrentHashMap<>();\n    private static final long TIMEOUT_MS = Duration.ofMinutes(30).toMillis();\n\n    public SseEmitter register(Long userId) {\n        SseEmitter emitter = new SseEmitter(TIMEOUT_MS);\n        emitters.computeIfAbsent(userId, id -> new CopyOnWriteArraySet<>()).add(emitter);\n\n        emitter.onCompletion(() -> remove(userId, emitter));\n        emitter.onTimeout(() -> remove(userId, emitter));\n        emitter.onError(e -> remove(userId, emitter));\n\n        try { emitter.send(SseEmitter.event().name(\"hello\").data(\"connected\")); }\n        catch (IOException ignored) {}\n\n        return emitter;\n    }\n\n    /** ⬇️ maintenant on push un DTO */\n    public void push(NotificationDto dto, Long recipientUserId) {\n        Set<SseEmitter> set = emitters.get(recipientUserId);\n        if (set == null || set.isEmpty()) return;\n\n        for (SseEmitter em : set) {\n            try {\n                em.send(\n                        SseEmitter.event()\n                                .name(\"notification\")\n                                .id(dto.id())\n                                .data(dto)\n                );\n            } catch (IOException e) {\n                remove(recipientUserId, em);\n            }\n        }\n    }\n\n    public void ping(Long userId) {\n        Set<SseEmitter> set = emitters.get(userId);\n        if (set == null) return;\n        for (SseEmitter em : set) {\n            try { em.send(SseEmitter.event().name(\"ping\").data(\"•\")); }\n            catch (IOException ignored) {}\n        }\n    }\n\n    private void remove(Long userId, SseEmitter emitter) {\n        var set = emitters.get(userId);\n        if (set != null) {\n            set.remove(emitter);\n            if (set.isEmpty()) emitters.remove(userId);\n        }\n    }\n\n}\n//\n//    // Map: userId -> set d'emitters (un par onglet navigateur)\n//    private final ConcurrentMap<Long, CopyOnWriteArraySet<SseEmitter>> emitters = new ConcurrentHashMap<>();\n//\n//    // Durée de vie d'une connexion SSE (le navigateur se reconnecte)\n//    private static final long TIMEOUT_MS = Duration.ofMinutes(30).toMillis();\n//\n//    /**\n//     * Appelé quand un client s'abonne au flux SSE (/notifications/stream).\n//     */\n//    public SseEmitter register(Long userId) {\n//        SseEmitter emitter = new SseEmitter(TIMEOUT_MS);\n//\n//        emitters.computeIfAbsent(userId, id -> new CopyOnWriteArraySet<>()).add(emitter);\n//\n//        // Nettoyage quand la connection se termine/expire/erreur\n//        emitter.onCompletion(() -> remove(userId, emitter));\n//        emitter.onTimeout(() -> remove(userId, emitter));\n//        emitter.onError(e -> remove(userId, emitter));\n//\n//        // message \"hello\" immédiat (facultatif)\n//        try {\n//            emitter.send(SseEmitter.event().name(\"hello\").data(\"connected\"));\n//        } catch (IOException ignored) {}\n//\n//        return emitter;\n//    }\n//\n//    /**\n//     * Envoie une notification à tous les clients connectés du destinataire.\n//     * Appeler ceci APRÈS COMMIT (voir NotificationService).\n//     */\n//    public void push(Notification n) {\n//        Long uid = n.getRecipient().getId_user();\n//        Set<SseEmitter> set = emitters.get(uid);\n//        if (set == null || set.isEmpty()) return;\n//\n//        for (SseEmitter em : set) {\n//            try {\n//                em.send(SseEmitter.event()\n//                        .name(\"notification\")     // event name côté front\n//                        .id(n.getIdnotif())       // permet \"Last-Event-ID\" si besoin\n//                        .data(n));                // Spring convertit en JSON\n//            } catch (IOException e) {\n//                // si le client a fermé, on retire l'emitter\n//                remove(uid, em);\n//            }\n//        }\n//    }\n//\n//    /** Envoi d'un ping pour garder la connexion active (optionnel). */"
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IFeedbackSevice.java",
+    "classes": [
+      {
+        "name": "IFeedbackSevice",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IQuizService.java",
+    "classes": [
+      {
+        "name": "IQuizService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/FeedbackService.java",
+    "classes": [
+      {
+        "name": "FeedbackService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "FeedbackRepository",
+        "name": "feedbackRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "AnnouncementRepository",
+        "name": "announcementRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "EarnedRewardRepository",
+        "name": "earnedRewardRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "NotificationService",
+        "name": "notificationService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/FileStorageService.java",
+    "classes": [
+      {
+        "name": "FileStorageService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "uploadDir"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/ServiceEmail.java",
+    "classes": [
+      {
+        "name": "ServiceEmail",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "JavaMailSender",
+        "name": "mailSender"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "from"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "supportEmail"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "loginUrl"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IUserService.java",
+    "classes": [
+      {
+        "name": "IUserService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/CategoryService.java",
+    "classes": [
+      {
+        "name": "CategoryService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "CategoryRepository",
+        "name": "categoryRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IAnnouncementService.java",
+    "classes": [
+      {
+        "name": "IAnnouncementService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/QuizFlowService.java",
+    "classes": [
+      {
+        "name": "QuizFlowService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final AnnouncementRepository",
+        "name": "announcementRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final QuizRepository",
+        "name": "quizRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final QuizAttemptRepository",
+        "name": "attemptRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final AttemptAnswerRepository",
+        "name": "answerRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final QuestionRepository",
+        "name": "questionRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final ResponsePanelisteRepository",
+        "name": "responseRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/AnnouncementService.java",
+    "classes": [
+      {
+        "name": "AnnouncementService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "AnnouncementRepository",
+        "name": "announcementRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "CategoryRepository",
+        "name": "categoryRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "RecompensesRepository",
+        "name": "recompensesRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "QuestionRepository",
+        "name": "questionRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "AttemptAnswerRepository",
+        "name": "attemptAnswerRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "QuizAttemptRepository",
+        "name": "quizAttemptRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "FeedbackRepository",
+        "name": "feedbackRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "EarnedRewardRepository",
+        "name": "earnedRewardRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "NotificationRepository",
+        "name": "notificationRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "uploadDir"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/ReclamationService.java",
+    "classes": [
+      {
+        "name": "ReclamationService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/UserService.java",
+    "classes": [
+      {
+        "name": "UserService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IRecompensesService.java",
+    "classes": [
+      {
+        "name": "IRecompensesService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/service/IReclamationService.java",
+    "classes": [
+      {
+        "name": "IReclamationService",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/JwtAuthentificationFilter.java",
+    "classes": [
+      {
+        "name": "JwtAuthentificationFilter",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserDetailsService",
+        "name": "userDetailsService"
+      },
+      {
+        "visibility": "private",
+        "type": "final JwtService",
+        "name": "jwtService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/ApplicationConfig.java",
+    "classes": [
+      {
+        "name": "ApplicationConfig",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final PasswordEncoder",
+        "name": "passwordEncoder"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/SseNoBufferFilter.java",
+    "classes": [
+      {
+        "name": "SseNoBufferFilter",
+        "type": "class",
+        "javadoc": "/**\n * Désactive le buffering proxy pour les réponses SSE afin\n * d'éviter des retards d'affichage côté client.\n */"
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/OsivConfig.java",
+    "classes": [
+      {
+        "name": "OsivConfig",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/JwtService.java",
+    "classes": [
+      {
+        "name": "JwtService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/config/SecurityConfiguration.java",
+    "classes": [
+      {
+        "name": "SecurityConfiguration",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final JwtAuthentificationFilter",
+        "name": "jwtAuthFilter"
+      },
+      {
+        "visibility": "private",
+        "type": "final AuthenticationProvider",
+        "name": "authenticationProvider"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/AttemptAnswerRepository.java",
+    "classes": [
+      {
+        "name": "AttemptAnswerRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/QuizRepository.java",
+    "classes": [
+      {
+        "name": "QuizRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/QuizAttemptRepository.java",
+    "classes": [
+      {
+        "name": "QuizAttemptRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/ReclamationRepository.java",
+    "classes": [
+      {
+        "name": "ReclamationRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/NotificationRepository.java",
+    "classes": [
+      {
+        "name": "NotificationRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/RecompensesRepository.java",
+    "classes": [
+      {
+        "name": "RecompensesRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/QuestionRepository.java",
+    "classes": [
+      {
+        "name": "QuestionRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/FeedbackRepository.java",
+    "classes": [
+      {
+        "name": "FeedbackRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/RoleRepository.java",
+    "classes": [
+      {
+        "name": "RoleRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/ResponsePanelisteRepository.java",
+    "classes": [
+      {
+        "name": "ResponsePanelisteRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/EarnedRewardRepository.java",
+    "classes": [
+      {
+        "name": "EarnedRewardRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/TokenRepository.java",
+    "classes": [
+      {
+        "name": "TokenRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/CategoryRepository.java",
+    "classes": [
+      {
+        "name": "CategoryRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/AnnouncementRepository.java",
+    "classes": [
+      {
+        "name": "AnnouncementRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/PlanningRepository.java",
+    "classes": [
+      {
+        "name": "PlanningRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/repository/UserRepository.java",
+    "classes": [
+      {
+        "name": "UserRepository",
+        "type": "interface",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/RestExceptionHandler.java",
+    "classes": [
+      {
+        "name": "RestExceptionHandler",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/AuthenticationService.java",
+    "classes": [
+      {
+        "name": "AuthenticationService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final RoleRepository",
+        "name": "roleRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final JwtService",
+        "name": "jwtService"
+      },
+      {
+        "visibility": "private",
+        "type": "final TokenRepository",
+        "name": "tokenRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final ServiceEmail",
+        "name": "serviceEmail"
+      },
+      {
+        "visibility": "private",
+        "type": "final FileStorageService",
+        "name": "fileStorageService"
+      },
+      {
+        "visibility": "private",
+        "type": "Token",
+        "name": "token"
+      },
+      {
+        "visibility": "private",
+        "type": "final PasswordEncoder",
+        "name": "passwordEncoder"
+      },
+      {
+        "visibility": "private",
+        "type": "final AuthenticationManager",
+        "name": "authenticationManager"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/AuthenticationResponse.java",
+    "classes": [
+      {
+        "name": "AuthenticationResponse",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "token"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "message"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "pending"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/OtpLoginController.java",
+    "classes": [
+      {
+        "name": "OtpLoginController",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "ConfirmOtpRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/v1/auth"
+        ],
+        "pos": 792
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/confirm-otp"
+        ],
+        "pos": 1041
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final TokenRepository",
+        "name": "tokenRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final JwtService",
+        "name": "jwtService"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "code"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/AuthenticationRequest.java",
+    "classes": [
+      {
+        "name": "AuthenticationRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "password"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/PasswordResetService.java",
+    "classes": [
+      {
+        "name": "PasswordResetService",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final TokenRepository",
+        "name": "tokenRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final PasswordEncoder",
+        "name": "passwordEncoder"
+      },
+      {
+        "visibility": "private",
+        "type": "final ServiceEmail",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "frontendUrl"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/RegisterRequest.java",
+    "classes": [
+      {
+        "name": "RegisterRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "password"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      },
+      {
+        "visibility": "private",
+        "type": "TypeUser",
+        "name": "typeUser"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "companyName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "jobTitle"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "age"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "ageRange"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "iban"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "role"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "password"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "role"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "ageRange"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdDate"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "jobTitle"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "companyName"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "enabled"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "verified"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "activationCode"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "needsAdminValidation"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/PasswordResetController.java",
+    "classes": [
+      {
+        "name": "PasswordResetController",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "ForgotRequest",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "ResetRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/v1/auth/password"
+        ],
+        "pos": 366
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/forgot"
+        ],
+        "pos": 655
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/reset"
+        ],
+        "pos": 895
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final PasswordResetService",
+        "name": "resetService"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "code"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "newPassword"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/auth/AuthenticationController.java",
+    "classes": [
+      {
+        "name": "AuthenticationController",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "FirstLoginOtpRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/v1/auth"
+        ],
+        "pos": 806
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getPanelist"
+        ],
+        "pos": 1404
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getPanelist/{id}"
+        ],
+        "pos": 1551
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/authenticate/first-login/verify"
+        ],
+        "pos": 1700
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/register"
+        ],
+        "pos": 3251
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/verify"
+        ],
+        "pos": 3458
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/register"
+        ],
+        "pos": 3745
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/register"
+        ],
+        "pos": 4282
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/authenticate"
+        ],
+        "pos": 4811
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/register/announceur"
+        ],
+        "pos": 5051
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/register/paneliste"
+        ],
+        "pos": 5356
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final AuthenticationService",
+        "name": "authenticationService"
+      },
+      {
+        "visibility": "private",
+        "type": "UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "TokenRepository",
+        "name": "tokenRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "JwtService",
+        "name": "jwtService"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "code"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/ReclamationController.java",
+    "classes": [
+      {
+        "name": "ReclamationController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/reclamation"
+        ],
+        "pos": 737
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addReclamation"
+        ],
+        "pos": 984
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine"
+        ],
+        "pos": 1565
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsReclamation/{id}"
+        ],
+        "pos": 1751
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateReclamation/{id}"
+        ],
+        "pos": 2087
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteReclamation/{id}"
+        ],
+        "pos": 2539
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addReclamation"
+        ],
+        "pos": 3150
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllReclamation"
+        ],
+        "pos": 3351
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsReclamation/{id}"
+        ],
+        "pos": 3516
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateReclamation/{id}"
+        ],
+        "pos": 3716
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteReclamation/{id}"
+        ],
+        "pos": 3957
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/ResponsePanelisteController.java",
+    "classes": [
+      {
+        "name": "ResponsePanelisteController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/reponsepaneliste"
+        ],
+        "pos": 350
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/add"
+        ],
+        "pos": 513
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/update/{id}"
+        ],
+        "pos": 652
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/get/{id}"
+        ],
+        "pos": 833
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/all"
+        ],
+        "pos": 972
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byQuestion/{qid}"
+        ],
+        "pos": 1089
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/delete/{id}"
+        ],
+        "pos": 1275
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byQuestion/{qid}"
+        ],
+        "pos": 1402
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "IResponsePanelisteService",
+        "name": "service"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/FeedbackController.java",
+    "classes": [
+      {
+        "name": "FeedbackController",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "MyFeedbackUpdateRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/feedback"
+        ],
+        "pos": 944
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/simple/announces/{announcementId}"
+        ],
+        "pos": 1297
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announcementId}"
+        ],
+        "pos": 2517
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine/announces/{announcementId}"
+        ],
+        "pos": 2736
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/mine/announces/{announcementId}"
+        ],
+        "pos": 3859
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/panelists/{panelistId}"
+        ],
+        "pos": 4515
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine/announces/{announcementId}"
+        ],
+        "pos": 4795
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announcementId}/stats"
+        ],
+        "pos": 5477
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/announces/{announcementId}"
+        ],
+        "pos": 5749
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/mine/announces/{announcementId}"
+        ],
+        "pos": 6312
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me"
+        ],
+        "pos": 7160
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me/rewards"
+        ],
+        "pos": 7551
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/rewards"
+        ],
+        "pos": 8165
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/announces/{announcementId}/rewards"
+        ],
+        "pos": 8540
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/owner/rewards/{earnedRewardId}/status"
+        ],
+        "pos": 9096
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/annonces/{announcementId}",
+          "/owner/announces/{announcementId}"
+        ],
+        "pos": 9880
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "IFeedbackSevice",
+        "name": "feedbackService"
+      },
+      {
+        "visibility": "private",
+        "type": "FeedbackRepository",
+        "name": "feedbackRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "public",
+        "type": "Integer",
+        "name": "rating"
+      },
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "comment"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/ParticipantQuizController.java",
+    "classes": [
+      {
+        "name": "ParticipantQuizController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/participation"
+        ],
+        "pos": 411
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/start"
+        ],
+        "pos": 783
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/attempts/{attemptId}/submit-raw"
+        ],
+        "pos": 1652
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/start"
+        ],
+        "pos": 1933
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/attempts/{attemptId}/submit-raw"
+        ],
+        "pos": 2361
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/start"
+        ],
+        "pos": 2784
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/attempts/{attemptId}/submit-raw"
+        ],
+        "pos": 3288
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/attempts"
+        ],
+        "pos": 3785
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/attempts"
+        ],
+        "pos": 4187
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/start"
+        ],
+        "pos": 4654
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/attempts/{attemptId}/submit-raw"
+        ],
+        "pos": 5107
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/attempts"
+        ],
+        "pos": 5613
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/attempts"
+        ],
+        "pos": 5991
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/attempts"
+        ],
+        "pos": 6491
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/announces/{announceId}/quizzes/{quizId}/attempts"
+        ],
+        "pos": 6889
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final QuizFlowService",
+        "name": "quizFlowService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/NotificationSseController.java",
+    "classes": [
+      {
+        "name": "NotificationSseController",
+        "type": "class",
+        "javadoc": "/**\n * Endpoint SSE : le front s'y connecte via EventSource.\n */"
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/notifications"
+        ],
+        "pos": 519
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/stream"
+        ],
+        "pos": 808
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final NotificationStreamService",
+        "name": "streamService"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/PanelistController.java",
+    "classes": [
+      {
+        "name": "PanelistController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/panelists"
+        ],
+        "pos": 343
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/eligible"
+        ],
+        "pos": 612
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepo"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/AnnouncementController.java",
+    "classes": [
+      {
+        "name": "AnnouncementController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/Announcement"
+        ],
+        "pos": 1117
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/categories"
+        ],
+        "pos": 1529
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addAnnouncement"
+        ],
+        "pos": 1796
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllAnnouncements"
+        ],
+        "pos": 2048
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllAnnounces"
+        ],
+        "pos": 2207
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsAnnouncement/{id}"
+        ],
+        "pos": 2347
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateAnnouncement/{id}"
+        ],
+        "pos": 2540
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteAnnouncement/{id}"
+        ],
+        "pos": 2778
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/uploadannounce/{id}"
+        ],
+        "pos": 2995
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/downloadannounce/{fileName}"
+        ],
+        "pos": 3251
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/images/{filename}"
+        ],
+        "pos": 3670
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addAnnounce"
+        ],
+        "pos": 4042
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/downloadannounce/{filename:.+}"
+        ],
+        "pos": 5824
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/updateAnnounceWithImages/{id}"
+        ],
+        "pos": 6600
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine"
+        ],
+        "pos": 7758
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/NotificationController.java",
+    "classes": [
+      {
+        "name": "NotificationController",
+        "type": "class",
+        "javadoc": "/**\n * Endpoints REST pour le front (Angular) :\n * - GET /notifications/me : liste des notifs de l'utilisateur courant\n * - POST /notifications/{id}/seen : marquer une notif comme vue\n * - POST /notifications/seen/all : tout marquer comme vu\n * - GET /notifications/me/unseen-count : compteur \"non vues\"\n */"
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/notifications"
+        ],
+        "pos": 959
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me"
+        ],
+        "pos": 1246
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/{id}/seen"
+        ],
+        "pos": 1777
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/seen/all"
+        ],
+        "pos": 2098
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me/unseen-count"
+        ],
+        "pos": 2584
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me"
+        ],
+        "pos": 3205
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/{id}/seen"
+        ],
+        "pos": 3715
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/seen/all"
+        ],
+        "pos": 4083
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me/unseen-count"
+        ],
+        "pos": 4620
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final NotificationService",
+        "name": "notificationService"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final NotificationService",
+        "name": "notificationService"
+      },
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/PlanningController.java",
+    "classes": [
+      {
+        "name": "PlanningController",
+        "type": "class",
+        "javadoc": "/**\n * Endpoints CRUD + assignation.\n * On déduit l'owner (annonceur) via l'email de l'utilisateur connecté.\n * Si tu as déjà le userId dans le token, adapte selon ton SecurityContext.\n */\n@RestController\n@RequestMapping(\"/plannings\")\n@RequiredArgsConstructor\n@CrossOrigin(origins = \"http://localhost:4200\", allowCredentials = \"true\")\npublic class PlanningController {\n\n    private final PlanningService service;\n    private final com.example.evaliaproject.repository.UserRepository userRepo;\n\n    // Annonceur : créer des slots (batch)\n//    @PostMapping(\"/slots/{id}\")\n//    public ResponseEntity<List<Planning>> createSlots(@PathVariable Long id, @RequestBody SlotCreateDto dto) {\n//      return ResponseEntity.ok(service.createSlots(id, dto));\n//\n//    }\n    @PostMapping(\"/slots/{id}\")\n    public ResponseEntity<List<PlanningDto>> createSlots(@PathVariable Long id,\n                                                         @RequestBody SlotCreateDto dto) {\n        var saved = service.createSlots(id, dto);        // <- List<Planning>\n        var body  = saved.stream().map(PlanningDto::of).toList(); // <- List<PlanningDto>\n        return ResponseEntity.ok(body);                  // <- ResponseEntity<List<PlanningDto>>\n    }\n    @PatchMapping(\"/{id}/status\")\n    public ResponseEntity<Planning> statusById(@PathVariable String id,\n                                               @RequestParam(\"actorId\") Long actorId,\n                                               @RequestBody UpdateStatusDto body) {\n        return ResponseEntity.ok(service.updateStatusById(actorId, id, body));\n    }\n    // Annonceur : assigner un paneliste à un slot\n//    @PostMapping(\"/{id}/assign\")\n//    public ResponseEntity<Planning> assign(Authentication auth, @PathVariable String id, @RequestBody AssignPanelistDto body) {\n//        return ResponseEntity.ok(service.assignPanelist(auth.getName(), id, body));\n//    }\n\n    @PostMapping(\"/{id}/assign\")\n    public ResponseEntity<PlanningDto> assign(Authentication auth, @PathVariable String id,\n                                              @RequestBody AssignPanelistDto body) {\n        return ResponseEntity.ok(PlanningDto.of(\n                service.assignPanelist(auth.getName(), id, body)\n        ));\n    }\n//    @PostMapping(\"/{id}/assign\")\n//    public ResponseEntity<PlanningDto> assign(Authentication auth, @PathVariable String id,\n//                                              @RequestBody AssignPanelistDto body) {\n//        return ResponseEntity.ok(PlanningDto.of(service.assignPanelist(auth.getName(), id, body)));\n//    }\n\n    // Changer le statut (paneliste ou annonceur)\n//    @PatchMapping(\"/{id}/status\")\n//    public ResponseEntity<Planning> status(Authentication auth, @PathVariable String id, @RequestBody UpdateStatusDto body) {\n//        return ResponseEntity.ok(service.updateStatus(auth.getName(), id, body));\n//    } hedhii\n//    @PatchMapping(\"/{id}/status\")\n//    public ResponseEntity<Planning> updateStatus(Authentication auth,\n//                                                 @PathVariable String id,\n//                                                 @RequestBody UpdateStatusDto body) {\n//        return ResponseEntity.ok(service.updateStatus(auth.getName(), id, body));\n//    }\n//    @PatchMapping(\"/{id}/status\")\n//    public ResponseEntity<PlanningDto> status(Authentication auth, @PathVariable String id,\n//                                              @RequestBody UpdateStatusDto body) {\n//        return ResponseEntity.ok(PlanningDto.of(service.updateStatus(auth.getName(), id, body)));\n//    }\n    // Paneliste : mon calendrier\n//    @GetMapping(\"/mine/{id}\")\n//    public ResponseEntity<List<Planning>> mine(@PathVariable Long id) {\n//        return ResponseEntity.ok(service.mine(id));\n//    }\n    @GetMapping(\"/mine/{id}\")\n    public ResponseEntity<List<PlanningDto>> mine(@PathVariable Long id) {\n        return ResponseEntity.ok(service.mine(id).stream().map(PlanningDto::of).toList());\n    }\n\n    // Annonceur : mon calendrier\n//    @GetMapping(\"/owner/{id}\")\n//    public ResponseEntity<List<Planning>> owner(@PathVariable Long id) {\n//        return ResponseEntity.ok(service.owner(id));\n//    }\n\n    @GetMapping(\"/owner/{id}\")\n    public ResponseEntity<List<PlanningDto>> owner(@PathVariable Long id) {\n        return ResponseEntity.ok(service.owner(id).stream().map(PlanningDto::of).toList());\n    }\n    // Filtre par annonce (utile pour vue “par annonce”)\n//    @GetMapping(\"/by-announcement/{annId}\")\n//    public ResponseEntity<List<Planning>> byAnnouncement(@PathVariable String annId) {\n//        return ResponseEntity.ok(service.byAnnouncement(annId));\n//    }\n\n\n    @GetMapping(\"/by-announcement/{annId}\")\n    public ResponseEntity<List<PlanningDto>> byAnnouncement(@PathVariable String annId) {\n        return ResponseEntity.ok(service.byAnnouncement(annId).stream().map(PlanningDto::of).toList());\n    }\n//    @PutMapping(\"/{id}\")\n//    public ResponseEntity<Planning> update(\n//            Authentication auth,\n//            @PathVariable String id,\n//            @RequestBody UpdatePlanningDto body) {\n//        return ResponseEntity.ok(service.update(auth.getName(), id, body));\n//    }\n@PutMapping(\"/{id}\")\npublic ResponseEntity<PlanningDto> update(Authentication auth, @PathVariable String id,\n                                          @RequestBody UpdatePlanningDto body) {\n    return ResponseEntity.ok(PlanningDto.of(service.update(auth.getName(), id, body)));\n}\n    // Suppression (owner)\n    @DeleteMapping(\"/{id}\")\n    @ResponseStatus(HttpStatus.NO_CONTENT)\n    public void delete(Authentication auth, @PathVariable String id) {\n        service.delete(auth.getName(), id);\n    }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n//    private final PlanningService service;\n//    private final com.example.evaliaproject.repository.UserRepository userRepo;\n//\n//    private Long currentUserId(Authentication auth) {\n//        var me = userRepo.findByEmail(auth.getName())\n//                .orElseThrow(() -> new IllegalArgumentException(\"User not found\"));\n//        return me.getId_user();\n//    }\n//\n//    /** Liste des RDV de l’annonceur (pour son calendrier) */\n//    @GetMapping(\"/owner/me\")\n//    public List<PlanningDto> myOwnerPlans(Authentication auth){\n//        return service.ownerList(currentUserId(auth));\n//    }\n//\n//    /** Liste des RDV du paneliste (son calendrier personnel) */\n//    @GetMapping(\"/panelist/me\")\n//    public List<PlanningDto> myPanelPlans(Authentication auth){\n//        return service.panelistList(currentUserId(auth));\n//    }\n//\n//    /** Création d’un créneau (annonceur) */\n//    @PostMapping\n//    @ResponseStatus(HttpStatus.CREATED)\n//    public PlanningDto create(@RequestBody UpsertPlanningRequest req, Authentication auth){\n//        return service.create(currentUserId(auth), req);\n//    }\n//\n//    /** MAJ d’un créneau (annonceur) */\n//    @PutMapping(\"/{id}\")\n//    public PlanningDto update(@PathVariable String id,\n//                              @RequestBody UpsertPlanningRequest req,\n//                              Authentication auth){\n//        return service.update(currentUserId(auth), id, req);\n//    }\n//\n//    /** Assigner un paneliste (annonceur) */\n//    @PutMapping(\"/{id}/assign\")\n//    public PlanningDto assign(@PathVariable String id,\n//                              @RequestBody AssignPanelistRequest req,\n//                              Authentication auth){\n//        return service.assign(currentUserId(auth), id, req.panelistId());\n//    }\n//\n//    /** Retirer un paneliste (annonceur) */"
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/plannings"
+        ],
+        "pos": 664
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/slots/{id}"
+        ],
+        "pos": 1002
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/slots/{id}"
+        ],
+        "pos": 1222
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/{id}/assign"
+        ],
+        "pos": 2110
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/{id}/assign"
+        ],
+        "pos": 2368
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/{id}/assign"
+        ],
+        "pos": 2712
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine/{id}"
+        ],
+        "pos": 4073
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/mine/{id}"
+        ],
+        "pos": 4239
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/{id}"
+        ],
+        "pos": 4478
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/{id}"
+        ],
+        "pos": 4648
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/by-announcement/{annId}"
+        ],
+        "pos": 4912
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/by-announcement/{annId}"
+        ],
+        "pos": 5122
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/{id}"
+        ],
+        "pos": 5368
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/{id}"
+        ],
+        "pos": 5648
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/{id}"
+        ],
+        "pos": 5959
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/owner/me"
+        ],
+        "pos": 6605
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/panelist/me"
+        ],
+        "pos": 6837
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [],
+        "pos": 7055
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/{id}"
+        ],
+        "pos": 7322
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/{id}/assign"
+        ],
+        "pos": 7653
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/{id}/unassign"
+        ],
+        "pos": 8003
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final PlanningService",
+        "name": "service"
+      },
+      {
+        "visibility": "private",
+        "type": "final PlanningService",
+        "name": "service"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/QuestionController.java",
+    "classes": [
+      {
+        "name": "QuestionController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/question"
+        ],
+        "pos": 332
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/add"
+        ],
+        "pos": 478
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/update/{id}"
+        ],
+        "pos": 630
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/delete/{id}"
+        ],
+        "pos": 824
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/get/{id}"
+        ],
+        "pos": 968
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/all"
+        ],
+        "pos": 1115
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byQuiz/{idQuiz}"
+        ],
+        "pos": 1242
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "IQuestionService",
+        "name": "questionService"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/QuizController.java",
+    "classes": [
+      {
+        "name": "QuizController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/quiz"
+        ],
+        "pos": 473
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addQuiz"
+        ],
+        "pos": 646
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllQuiz"
+        ],
+        "pos": 861
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsQuiz/{id}"
+        ],
+        "pos": 978
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateQuiz/{id}"
+        ],
+        "pos": 1133
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsQuiz/{id}"
+        ],
+        "pos": 1309
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteQuiz/{id}"
+        ],
+        "pos": 1560
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/submitQuiz/{id}"
+        ],
+        "pos": 1734
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byAnnouncement/{id}"
+        ],
+        "pos": 1992
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/RecompensesController.java",
+    "classes": [
+      {
+        "name": "RecompensesController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [],
+        "pos": 631
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byAnnouncement/{id}"
+        ],
+        "pos": 879
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/byAnnouncement/{id}"
+        ],
+        "pos": 1523
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addRecomponse"
+        ],
+        "pos": 1852
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllRecompenses"
+        ],
+        "pos": 2038
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsRecompenses/{id}"
+        ],
+        "pos": 2190
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateRecompenses/{id}"
+        ],
+        "pos": 2380
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteRecompenses/{id}"
+        ],
+        "pos": 2611
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/FeedbackFileController.java",
+    "classes": [
+      {
+        "name": "FeedbackFileController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/feedback-files"
+        ],
+        "pos": 471
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/images/{filename:.+}"
+        ],
+        "pos": 548
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/UserController.java",
+    "classes": [
+      {
+        "name": "UserController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [],
+        "pos": 488
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/addUser"
+        ],
+        "pos": 787
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllUsers"
+        ],
+        "pos": 1198
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsUser/{id}"
+        ],
+        "pos": 1318
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getPanelist"
+        ],
+        "pos": 1473
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/updateUser/{id}"
+        ],
+        "pos": 1618
+      },
+      {
+        "annotation": "DeleteMapping",
+        "paths": [
+          "/deleteUser/{id}"
+        ],
+        "pos": 1791
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/CategoryController.java",
+    "classes": [
+      {
+        "name": "CategoryController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/categories"
+        ],
+        "pos": 618
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getDetailsCategory/{id}"
+        ],
+        "pos": 890
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/getAllCategory"
+        ],
+        "pos": 1064
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/{id}/announces"
+        ],
+        "pos": 1201
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/init"
+        ],
+        "pos": 1376
+      }
+    ],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/controller/AdminValidationController.java",
+    "classes": [
+      {
+        "name": "AdminValidationController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/v1/admin"
+        ],
+        "pos": 691
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/pending-users"
+        ],
+        "pos": 895
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/validate-user/{userId}"
+        ],
+        "pos": 1289
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/validate/{id}"
+        ],
+        "pos": 2087
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/pending-users"
+        ],
+        "pos": 2450
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/validate-user/{id}"
+        ],
+        "pos": 2870
+      },
+      {
+        "annotation": "PostMapping",
+        "paths": [
+          "/reject-user/{id}"
+        ],
+        "pos": 3264
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/PlanningDto.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/OwnerRewardItemDto.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/PanelistOptionDto.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/PanelistRewardItemDto.java",
+    "classes": [
+      {
+        "name": "PanelistRewardItemDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementId"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementName"
+      },
+      {
+        "visibility": "private",
+        "type": "typeRecompenses",
+        "name": "rewardType"
+      },
+      {
+        "visibility": "private",
+        "type": "BigDecimal",
+        "name": "amount"
+      },
+      {
+        "visibility": "private",
+        "type": "RewardPayoutStatus",
+        "name": "status"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/SlotCreateDto.java",
+    "classes": [
+      {
+        "name": "SlotCreateDto",
+        "type": "class",
+        "javadoc": null
+      },
+      {
+        "name": "Slot",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementId"
+      },
+      {
+        "visibility": "private",
+        "type": "List<Slot>",
+        "name": "slots"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "startsAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "endsAt"
+      },
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "panelistId"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/NotificationDto.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/UpdatePlanningDto.java",
+    "classes": [
+      {
+        "name": "UpdatePlanningDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementId"
+      },
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "panelistId"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "startsAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "endsAt"
+      },
+      {
+        "visibility": "private",
+        "type": "AppointmentStatus",
+        "name": "status"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/MyFeedbackItemDto.java",
+    "classes": [
+      {
+        "name": "MyFeedbackItemDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementId"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementName"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "rating"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "comment"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/NotificationMapper.java",
+    "classes": [
+      {
+        "name": "NotificationMapper",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/FeedbackStatsDto.java",
+    "classes": [
+      {
+        "name": "FeedbackStatsDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "total"
+      },
+      {
+        "visibility": "private",
+        "type": "double",
+        "name": "average"
+      },
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "stars1"
+      },
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "stars2"
+      },
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "stars3"
+      },
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "stars4"
+      },
+      {
+        "visibility": "private",
+        "type": "long",
+        "name": "stars5"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/AssignPanelistDto.java",
+    "classes": [
+      {
+        "name": "AssignPanelistDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "panelistId"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/UpdateStatusDto.java",
+    "classes": [
+      {
+        "name": "UpdateStatusDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "AppointmentStatus",
+        "name": "status"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/RecompenseLite.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/PanelistRewardsDto.java",
+    "classes": [],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/dto/OwnerFeedbackItemDto.java",
+    "classes": [
+      {
+        "name": "OwnerFeedbackItemDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idFeedback"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "rating"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "comment"
+      },
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "panelistId"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "panelistFirstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "panelistLastname"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/AttemptDTO.java",
+    "classes": [
+      {
+        "name": "AttemptDTO",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idAttempt"
+      },
+      {
+        "visibility": "private",
+        "type": "AttemptStatus",
+        "name": "status"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/NotificationType.java",
+    "classes": [
+      {
+        "name": "NotificationType",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/typeRecompenses.java",
+    "classes": [
+      {
+        "name": "typeRecompenses",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/User.java",
+    "classes": [
+      {
+        "name": "User",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "id_user"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "password"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "firstLoginCompleted"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "registreCommercePath"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "registreCommerceOriginalName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "ageRange"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "jobTitle"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "iban"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "companyName"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "enabled"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "verified"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "activationCode"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "needsAdminValidation"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdDate"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "LastModifiedDate"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/TokenType.java",
+    "classes": [
+      {
+        "name": "TokenType",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/QuizAttempt.java",
+    "classes": [
+      {
+        "name": "QuizAttempt",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idAttempt"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "Quiz",
+        "name": "quiz"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "panelist"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "startedAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "submittedAt"
+      },
+      {
+        "visibility": "private",
+        "type": "AttemptStatus",
+        "name": "status"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "score"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "rewardGranted"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/RewardPayoutStatus.java",
+    "classes": [
+      {
+        "name": "RewardPayoutStatus",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/ResponsePaneliste.java",
+    "classes": [
+      {
+        "name": "ResponsePaneliste",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "IdResponsePaneliste"
+      },
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "IdPaneliste"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "isCorrect"
+      },
+      {
+        "visibility": "private",
+        "type": "Question",
+        "name": "question"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Announce.java",
+    "classes": [
+      {
+        "name": "Announce",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idAnnouncement"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announceName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "image"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "productImages"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "officeAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "user"
+      },
+      {
+        "visibility": "private",
+        "type": "Admin",
+        "name": "admin"
+      },
+      {
+        "visibility": "private",
+        "type": "Category",
+        "name": "category"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Token.java",
+    "classes": [
+      {
+        "name": "Token",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "token"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "expiresAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "validatedAt"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "user"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "usedAt"
+      },
+      {
+        "visibility": "private",
+        "type": "TokenType",
+        "name": "type"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/TypeUser.java",
+    "classes": [
+      {
+        "name": "TypeUser",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/AttemptStatus.java",
+    "classes": [
+      {
+        "name": "AttemptStatus",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Role.java",
+    "classes": [
+      {
+        "name": "Role",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "idrole"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "nameRole"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "description"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Admin.java",
+    "classes": [
+      {
+        "name": "Admin",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "idadmin"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "password"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "confirmPassword"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Motif.java",
+    "classes": [
+      {
+        "name": "Motif",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Recompenses.java",
+    "classes": [
+      {
+        "name": "Recompenses",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "IdRecompense"
+      },
+      {
+        "visibility": "private",
+        "type": "BigDecimal",
+        "name": "amount"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "label"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/AttemptAnswerView.java",
+    "classes": [
+      {
+        "name": "AttemptAnswerView",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/EarnedReward.java",
+    "classes": [
+      {
+        "name": "EarnedReward",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "panelist"
+      },
+      {
+        "visibility": "private",
+        "type": "typeRecompenses",
+        "name": "rewardType"
+      },
+      {
+        "visibility": "private",
+        "type": "BigDecimal",
+        "name": "amount"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "label"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Notification.java",
+    "classes": [
+      {
+        "name": "Notification",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idnotif"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "recipient"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "NotificationType",
+        "name": "type"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "message"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Quiz.java",
+    "classes": [
+      {
+        "name": "Quiz",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idQuiz"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "List<Question>",
+        "name": "questions"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/typeReclamation.java",
+    "classes": [
+      {
+        "name": "typeReclamation",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/FeedbackOwnerDto.java",
+    "classes": [
+      {
+        "name": "FeedbackOwnerDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idFeedback"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "rating"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "comment"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "panelistId"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "panelistName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "panelistEmail"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "announcementId"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Feedback.java",
+    "classes": [
+      {
+        "name": "Feedback",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idFeedback"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "panelist"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "formDataJson"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "comment"
+      },
+      {
+        "visibility": "private",
+        "type": "Integer",
+        "name": "rating"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "imageName"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Planning.java",
+    "classes": [
+      {
+        "name": "Planning",
+        "type": "class",
+        "javadoc": "/**\n * Un créneau \"test au bureau\".\n * Un seul paneliste par rendez-vous (ManyToOne).\n */"
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "visibility": "private",
+        "type": "Announce",
+        "name": "announcement"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "owner"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "panelist"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "startsAt"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDateTime",
+        "name": "endsAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/UserStatus.java",
+    "classes": [
+      {
+        "name": "UserStatus",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Reclamation.java",
+    "classes": [
+      {
+        "name": "Reclamation",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "Idreclamation"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "private",
+        "type": "Motif",
+        "name": "motif"
+      },
+      {
+        "visibility": "private",
+        "type": "User",
+        "name": "user"
+      },
+      {
+        "visibility": "private",
+        "type": "TypeUser",
+        "name": "userType"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDate",
+        "name": "createdAt"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/AppointmentStatus.java",
+    "classes": [
+      {
+        "name": "AppointmentStatus",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Question.java",
+    "classes": [
+      {
+        "name": "Question",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idQuestion"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "private",
+        "type": "List<ResponsePaneliste>",
+        "name": "responses"
+      },
+      {
+        "visibility": "private",
+        "type": "Quiz",
+        "name": "quiz"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Category.java",
+    "classes": [
+      {
+        "name": "Category",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "idcategory"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "nameCategory"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/TestMode.java",
+    "classes": [
+      {
+        "name": "TestMode",
+        "type": "enum",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": []
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/Campagne.java",
+    "classes": [
+      {
+        "name": "Campagne",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "idCampagne"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "name"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDate",
+        "name": "startDate"
+      },
+      {
+        "visibility": "private",
+        "type": "LocalDate",
+        "name": "endDate"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/QuizAttemptView.java",
+    "classes": [
+      {
+        "name": "QuizAttemptView",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/entity/AttemptAnswer.java",
+    "classes": [
+      {
+        "name": "AttemptAnswer",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "idAttemptAnswer"
+      },
+      {
+        "visibility": "private",
+        "type": "QuizAttempt",
+        "name": "attempt"
+      },
+      {
+        "visibility": "private",
+        "type": "Question",
+        "name": "question"
+      },
+      {
+        "visibility": "private",
+        "type": "ResponsePaneliste",
+        "name": "selectedResponse"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "freeText"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/ai/ChatDtos/ChatRequest.java",
+    "classes": [
+      {
+        "name": "ChatRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "public",
+        "type": "List<ChatMessage>",
+        "name": "messages"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/ai/ChatDtos/ChatAnswer.java",
+    "classes": [
+      {
+        "name": "ChatAnswer",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "model"
+      },
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "finishReason"
+      },
+      {
+        "visibility": "public",
+        "type": "Map<String, Object>",
+        "name": "raw"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/ai/ChatDtos/ChatMessage.java",
+    "classes": [
+      {
+        "name": "ChatMessage",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "role"
+      },
+      {
+        "visibility": "public",
+        "type": "String",
+        "name": "content"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/profile/dto/ProfileController.java",
+    "classes": [
+      {
+        "name": "ProfileController",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [
+      {
+        "annotation": "RequestMapping",
+        "paths": [
+          "/api/v1/profile"
+        ],
+        "pos": 861
+      },
+      {
+        "annotation": "GetMapping",
+        "paths": [
+          "/me"
+        ],
+        "pos": 1413
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/me"
+        ],
+        "pos": 1657
+      },
+      {
+        "annotation": "PutMapping",
+        "paths": [
+          "/password"
+        ],
+        "pos": 5350
+      }
+    ],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "final UserRepository",
+        "name": "userRepository"
+      },
+      {
+        "visibility": "private",
+        "type": "final PasswordEncoder",
+        "name": "passwordEncoder"
+      },
+      {
+        "visibility": "private",
+        "type": "final TokenRepository",
+        "name": "tokenRepository"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/profile/dto/UpdateMeRequest.java",
+    "classes": [
+      {
+        "name": "UpdateMeRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "companyName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "jobTitle"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "ageRange"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "iban"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/profile/dto/MeDto.java",
+    "classes": [
+      {
+        "name": "MeDto",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "Long",
+        "name": "id_user"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "firstname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "lastname"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "numTelephone"
+      },
+      {
+        "visibility": "private",
+        "type": "TypeUser",
+        "name": "typeUser"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "companyName"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "jobTitle"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "ageRange"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "iban"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "deliveryAddress"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "verified"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "enabled"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "needsAdminValidation"
+      },
+      {
+        "visibility": "private",
+        "type": "boolean",
+        "name": "firstLoginCompleted"
+      }
+    ]
+  },
+  {
+    "path": "java/com/example/evaliaproject/profile/dto/ChangePasswordRequest.java",
+    "classes": [
+      {
+        "name": "ChangePasswordRequest",
+        "type": "class",
+        "javadoc": null
+      }
+    ],
+    "mappings": [],
+    "fields": [
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "currentPassword"
+      },
+      {
+        "visibility": "private",
+        "type": "String",
+        "name": "newPassword"
+      }
+    ]
+  }
+]

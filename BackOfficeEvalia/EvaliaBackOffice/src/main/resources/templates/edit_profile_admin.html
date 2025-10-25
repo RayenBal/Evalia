@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Mon Profil - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-user-edit text-gradient"></i> Modifier Mon Profil</h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-secondary-modern" th:href="@{/admin/details/{id}(id=${admin.idadmin})}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h2><i class="fas fa-user-circle"></i> Informations du Profil</h2>
+                        <p class="card-subtitle">Modifiez vos informations personnelles</p>
+                    </div>
+
+                    <form th:action="@{/admin/profile/update}" th:object="${admin}" method="post" class="form-modern">
+                        <input type="hidden" th:field="*{idadmin}"/>
+
+                        <div class="section-title">
+                            <i class="fas fa-user"></i> Informations Personnelles
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="firstname" class="form-label-modern">
+                                        <i class="fas fa-user"></i> Prénom
+                                    </label>
+                                    <input type="text" 
+                                           th:field="*{firstname}" 
+                                           id="firstname"
+                                           class="form-control-modern" 
+                                           placeholder="Votre prénom"
+                                           required/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label for="lastname" class="form-label-modern">
+                                        <i class="fas fa-user"></i> Nom
+                                    </label>
+                                    <input type="text" 
+                                           th:field="*{lastname}" 
+                                           id="lastname"
+                                           class="form-control-modern" 
+                                           placeholder="Votre nom"
+                                           required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label for="email" class="form-label-modern">
+                                <i class="fas fa-envelope"></i> Adresse Email
+                            </label>
+                            <input type="email" 
+                                   th:field="*{email}" 
+                                   id="email"
+                                   class="form-control-modern" 
+                                   placeholder="votre.email@example.com"
+                                   required/>
+                            <div class="form-helper-text">
+                                Cette adresse sera utilisée pour la connexion
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="alert-modern alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Information</strong>
+                                <p style="margin: 8px 0 0 0; font-size: 14px;">
+                                    Pour modifier votre mot de passe ou vos rôles, veuillez contacter un Super Administrateur.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Actions -->
+                        <div class="btn-group-modern" style="justify-content: flex-end;">
+                            <a th:href="@{/admin/details/{id}(id=${admin.idadmin})}" 
+                               class="btn-modern btn-secondary-modern">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

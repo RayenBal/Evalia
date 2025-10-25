@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Permissions - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-key text-gradient"></i> Gestion des Permissions</h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-primary-modern" th:href="@{/permissions/create}">
+                <i class="fas fa-plus"></i> Ajouter Permission
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="fas fa-key"></i>
+                </div>
+                <div class="stat-value" th:text="${#lists.size(permissions)}">0</div>
+                <div class="stat-label">Total Permissions</div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h2><i class="fas fa-list"></i> Liste des Permissions</h2>
+                <div class="search-bar">
+                    <input type="text" class="form-control-modern" placeholder="Rechercher une permission..." id="searchInput">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+            <thead>
+            <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-tag"></i> Nom de la Permission</th>
+                            <th><i class="fas fa-info-circle"></i> Description</th>
+                            <th><i class="fas fa-users"></i> Rôles Associés</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+            </tr>
+            </thead>
+                    <tbody id="permissionsTable">
+            <tr th:each="permission : ${permissions}">
+                            <td><span class="badge-modern badge-primary" th:text="${permission.idPermission}">1</span></td>
+                            <td>
+                                <strong th:text="${permission.namePermission}">Permission Name</strong>
+                            </td>
+                            <td>
+                                <span class="text-secondary" th:text="${permission.description}">Description</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    <span th:each="role : ${permission.roles}" 
+                                          class="badge-modern badge-info" 
+                th:text="${role.nameRole}">RoleName</span>
+                                    <span th:if="${#lists.isEmpty(permission.roles)}" 
+                                          class="badge-modern badge-warning">Aucun rôle</span>
+                                </div>
+                </td>
+                <td>
+                                <div class="table-actions">
+                                    <a th:href="@{'/permissions/edit/' + ${permission.idPermission}}" 
+                                       class="btn-modern btn-sm-modern" 
+                                       style="background: #f59e0b; color: white;"
+                                       title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{'/permissions/delete/' + ${permission.idPermission}}" 
+                                       class="btn-modern btn-danger-modern btn-sm-modern"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette permission ?');"
+                                       title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(permissions)}" class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <h3>Aucune permission trouvée</h3>
+                <p>Commencez par créer votre première permission</p>
+                <a class="btn-modern btn-primary-modern" th:href="@{/permissions/create}">
+                    <i class="fas fa-plus"></i> Créer une Permission
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#permissionsTable tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+</body>
+</html>

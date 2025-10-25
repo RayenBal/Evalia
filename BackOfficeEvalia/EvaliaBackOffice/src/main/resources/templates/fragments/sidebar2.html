@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Sidebar Moderne pour Validation -->
+<nav th:fragment="sidebar" class="sidebar" sec:authorize="isAuthenticated()">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">EVALIA</div>
+        <div class="sidebar-subtitle">Validation Admin</div>
+    </div>
+
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a th:href="@{/admin/me}" class="nav-link" data-path="/admin/me">
+                <i class="fas fa-user-circle"></i>
+                <span>Mon Profil</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/adminn/pending-users}" class="nav-link" data-path="/adminn/pending-users">
+                <i class="fas fa-user-clock"></i>
+                <span>En attente de validation</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/adminn/approved-users}" class="nav-link" data-path="/adminn/approved-users">
+                <i class="fas fa-user-check"></i>
+                <span>Utilisateurs Validés</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/adminn/rejected-users}" class="nav-link" data-path="/adminn/rejected-users">
+                <i class="fas fa-user-times"></i>
+                <span>Utilisateurs Rejetés</span>
+            </a>
+        </li>
+    </ul>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </button>
+    </form>
+</nav>
+
+<script>
+    (function () {
+        const current = window.location.pathname;
+        document.querySelectorAll('.sidebar a.nav-link').forEach(a => {
+            const want = a.getAttribute('data-path');
+            if (want && current.startsWith(want)) a.classList.add('active');
+        });
+    })();
+</script>
+</body>
+</html>

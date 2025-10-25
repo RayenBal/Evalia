@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{_layout :: layout(~{::content})}">
+<th:block th:fragment="content">
+
+    <head><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script></head>
+
+    <h2 class="mb-3">Statistiques réclamations</h2>
+
+    <form class="row g-2 mb-4" th:action="@{/bo/reclamations/stats}" method="get">
+        <div class="col-auto">
+            <label class="form-label">Type</label>
+            <select class="form-select" name="type">
+                <option value="" th:selected="${selectedType == null}">Tous</option>
+                <option th:each="t : ${types}" th:value="${t}" th:text="${t}" th:selected="${selectedType == t}"></option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Du</label>
+            <input class="form-control" type="date" name="from" th:value="${from}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Au</label>
+            <input class="form-control" type="date" name="to" th:value="${to}">
+        </div>
+        <div class="col-auto align-self-end"><button class="btn btn-primary">Appliquer</button></div>
+    </form>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm"><div class="card-body">
+                <div class="text-muted mb-1">Total réclamations</div>
+                <div class="h3 mb-0" th:text="${overview.total}">0</div>
+            </div></div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm"><div class="card-body">
+                <div class="text-muted mb-1">Répartition par type</div>
+                <canvas id="byType"></canvas>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm"><div class="card-body">
+                <h5 class="card-title">Répartition par motif</h5>
+                <canvas id="byMotif"></canvas>
+            </div></div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm"><div class="card-body">
+                <h5 class="card-title">Évolution journalière</h5>
+                <canvas id="daily"></canvas>
+            </div></div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const byType = /*[[${byType}]]*/ [];
+        const byMotif = /*[[${byMotif}]]*/ [];
+        const daily  = /*[[${daily}]]*/ [];
+
+        const mapPairs = (arr, k, v) => ({ labels: arr.map(o => o[k]), data: arr.map(o => o[v]) });
+
+        const t = mapPairs(byType, 'userType', 'total');
+        new Chart(document.getElementById('byType'), {
+            type: 'doughnut',
+            data: { labels: t.labels, datasets: [{ data: t.data }] },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        const m = mapPairs(byMotif, 'motif', 'total');
+        new Chart(document.getElementById('byMotif'), {
+            type: 'bar',
+            data: { labels: m.labels, datasets: [{ data: m.data }] },
+            options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
+        });
+
+        const d = mapPairs(daily, 'day', 'total');
+        new Chart(document.getElementById('daily'), {
+            type: 'line',
+            data: { labels: d.labels, datasets: [{ data: d.data, fill: false, tension: .3 }] },
+            options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
+        });
+    </script>
+
+</th:block>
+</html>

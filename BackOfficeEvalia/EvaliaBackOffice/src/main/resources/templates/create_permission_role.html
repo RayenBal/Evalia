@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer une Permission - BackOffice</title>
+
+  <!-- Bootstrap + Icons + Police -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Feuille de styles moderne (identique aux autres pages modernisées) -->
+  <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <h1><i class="fas fa-plus-circle text-gradient"></i> Créer une Permission</h1>
+    <div class="top-bar-actions">
+      <!-- Respect du comportement initial : retour vers la liste des rôles -->
+      <a class="btn-modern btn-secondary-modern" th:href="@{/roles}">
+        <i class="fas fa-arrow-left"></i> Retour
+      </a>
+    </div>
+  </div>
+
+  <div class="container-modern">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card-modern">
+          <div class="card-header-modern">
+            <h2><i class="fas fa-key"></i> Nouvelle Permission</h2>
+            <p class="card-subtitle">Renseignez les informations de la nouvelle permission</p>
+          </div>
+
+          <!-- Formulaire : mêmes endpoints/champs qu'à l'identique -->
+          <form th:action="@{/permissions/saveR}" th:object="${permission}" method="post" class="form-modern">
+            <div class="form-group-modern">
+              <label for="namePermission" class="form-label-modern">
+                <i class="fas fa-tag"></i> Nom de la Permission
+              </label>
+              <input
+                      type="text"
+                      id="namePermission"
+                      th:field="*{namePermission}"
+                      class="form-control-modern"
+                      placeholder="Ex : MANAGE_USERS, VIEW_REPORTS…"
+                      required
+              />
+              <div class="form-helper-text">
+                Utilisez des majuscules et des underscores pour le format.
+              </div>
+            </div>
+
+            <div class="form-group-modern">
+              <label for="description" class="form-label-modern">
+                <i class="fas fa-align-left"></i> Description
+              </label>
+              <input
+                      type="text"
+                      id="description"
+                      th:field="*{description}"
+                      class="form-control-modern"
+                      placeholder="Décrivez le rôle et l'utilisation de cette permission…"
+                      required
+              />
+              <div class="form-helper-text">
+                Expliquez clairement ce que cette permission autorise.
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="btn-group-modern" style="justify-content: flex-end;">
+              <!-- Respect du lien d’annulation d’origine -->
+              <a th:href="@{/roles}" class="btn-modern btn-secondary-modern">
+                <i class="fas fa-times"></i> Annuler
+              </a>
+              <button type="submit" class="btn-modern btn-primary-modern">
+                <i class="fas fa-save"></i> Enregistrer
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- /card -->
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Rôles - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-user-tag text-gradient"></i> Gestion des Rôles</h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-primary-modern" th:href="@{/roles/create}">
+                <i class="fas fa-plus"></i> Ajouter Rôle
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i class="fas fa-user-tag"></i>
+                </div>
+                <div class="stat-value" th:text="${#lists.size(roles)}">0</div>
+                <div class="stat-label">Total Rôles</div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h2><i class="fas fa-list"></i> Liste des Rôles</h2>
+                <div class="search-bar">
+                    <input type="text" class="form-control-modern" placeholder="Rechercher un rôle..." id="searchInput">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-tag"></i> Nom du Rôle</th>
+                            <th><i class="fas fa-info-circle"></i> Description</th>
+                            <th><i class="fas fa-key"></i> Permissions</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTable">
+                        <tr th:each="role : ${roles}">
+                            <td><span class="badge-modern badge-primary" th:text="${role.idrole}">1</span></td>
+                            <td>
+                                <strong th:text="${role.nameRole}">Admin</strong>
+                            </td>
+                            <td>
+                                <span class="text-secondary" th:text="${role.description}">Access admin panel</span>
+                            </td>
+                            <td>
+                                <div style="max-height: 120px; overflow-y: auto; padding: 8px; background: #f8fafc; border-radius: 6px;">
+                                    <div th:if="${!#lists.isEmpty(role.permissions)}">
+                                        <div th:each="perm : ${role.permissions}" style="margin-bottom: 8px;">
+                                            <span class="badge-modern badge-success" style="display: inline-block; margin-bottom: 4px;">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span th:text="${perm.namePermission}">Permission</span>
+                                            </span>
+                                            <small class="text-secondary" style="display: block; font-size: 11px; margin-left: 4px;" 
+                                                   th:text="${perm.description}">Description</small>
+                                        </div>
+                                    </div>
+                                    <span th:if="${#lists.isEmpty(role.permissions)}" 
+                                          class="badge-modern badge-warning">Aucune permission</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a th:href="@{'/roles/edit/' + ${role.idrole}}" 
+                                       class="btn-modern btn-sm-modern" 
+                                       style="background: #f59e0b; color: white;"
+                                       title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{'/roles/delete/' + ${role.idrole}}" 
+                                       class="btn-modern btn-danger-modern btn-sm-modern"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?');"
+                                       title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(roles)}" class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <h3>Aucun rôle trouvé</h3>
+                <p>Commencez par créer votre premier rôle</p>
+                <a class="btn-modern btn-primary-modern" th:href="@{/roles/create}">
+                    <i class="fas fa-plus"></i> Créer un Rôle
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#rolesTable tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+/* Sidebar fixe à gauche */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: #1f2937; /* gris foncé élégant */
+    color: #fff;
+    overflow-y: auto;
+    z-index: 1040;
+}
+
+/* Contenu principal décalé */
+.page-with-sidebar {
+    margin-left: 240px;
+    padding: 24px;
+}
+
+/* Liens */
+.sidebar .nav-link {
+    border-radius: 8px;
+    margin: 4px 0;
+}
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+/* Option : masquer les anciennes barres si présentes */
+.hide-when-sidebar {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar { width: 210px; }
+    .page-with-sidebar { margin-left: 210px; }
+}

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Rôle - BackOffice</title>
+
+    <!-- Bootstrap + Icons + Police -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Feuille de styles moderne (même principe que ton 2e exemple) -->
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+    >
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-user-shield text-gradient"></i> Modifier Rôle</h1>
+        <div class="top-bar-actions">
+            <!-- Conserve la navigation d'origine : retour vers /permissions -->
+            <a class="btn-modern btn-secondary-modern" th:href="@{/permissions}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Carte -->
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h2><i class="fas fa-pen-to-square"></i> Informations du Rôle</h2>
+                        <p class="card-subtitle">Mettez à jour le nom, la description et les permissions associées</p>
+                    </div>
+
+                    <!-- Formulaire (mêmes endpoints/champs qu'à l'identique) -->
+                    <form th:action="@{/roles/update}" th:object="${role}" method="post" class="form-modern">
+                        <input type="hidden" th:field="*{idrole}"/>
+
+                        <!-- Nom du rôle -->
+                        <div class="form-group-modern">
+                            <label for="nameRole" class="form-label-modern">
+                                <i class="fas fa-tag"></i> Nom du Rôle
+                            </label>
+                            <input
+                                    type="text"
+                                    th:field="*{nameRole}"
+                                    id="nameRole"
+                                    class="form-control-modern"
+                                    placeholder="Ex : ADMIN, MANAGER, AUDITOR…"
+                                    required
+                            />
+                            <div class="form-helper-text">
+                                Choisissez un nom clair et cohérent (ex. MAJUSCULES et underscores).
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group-modern">
+                            <label for="description" class="form-label-modern">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            <textarea
+                                    th:field="*{description}"
+                                    id="description"
+                                    class="form-control-modern"
+                                    rows="3"
+                                    placeholder="Décrivez le rôle et son périmètre…"
+                                    required
+                            ></textarea>
+                            <div class="form-helper-text">
+                                Soyez précis(e) : responsabilités, limites, contexte d’utilisation.
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Permissions -->
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                <i class="fas fa-key"></i> Permissions
+                            </label>
+
+                            <!-- Conteneur scrollable (comme ton 1er code) -->
+                            <div class="permissions-box border rounded-3 p-3"
+                                 style="max-height: 260px; overflow-y: auto;">
+                                <div class="form-check-modern" th:each="perm : ${allPermissions}">
+                                    <input class="form-check-input-modern"
+                                           type="checkbox"
+                                           name="selectedPermissions"
+                                           th:value="${perm.idPermission}"
+                                           th:checked="${role.permissions.contains(perm)}"
+                                           th:id="|perm__${perm.idPermission}|"/>
+                                    <label class="form-check-label-modern"
+                                           th:for="|perm__${perm.idPermission}|">
+                                        <span class="perm-name" th:text="${perm.namePermission}"></span>
+                                        <span class="text-muted"> — </span>
+                                        <span class="perm-desc text-muted"
+                                              th:text="${perm.description}"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Lien d’ajout (identique à l’original) -->
+                            <div class="btn-group-modern mt-3" style="justify-content: flex-end;">
+                                <a class="btn-modern btn-success-modern" th:href="@{/permissions/createPR}">
+                                    <i class="fas fa-plus"></i> Ajouter une permission
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Actions -->
+                        <div class="btn-group-modern" style="justify-content: flex-end;">
+                            <!-- Conserve le lien d’annulation d’origine -->
+                            <a th:href="@{/permissions}" class="btn-modern btn-secondary-modern">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn-modern btn-success-modern">
+                                <i class="fas fa-save"></i> Mettre à jour
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /carte -->
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Edit Role</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            background-color: #f8f9fa;-->
+<!--        }-->
+
+<!--        .form-container {-->
+<!--            background-color: white;-->
+<!--            border-radius: 12px;-->
+<!--            padding: 30px;-->
+<!--            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        h2 {-->
+<!--            font-weight: 600;-->
+<!--            color: #2c3e50;-->
+<!--            margin-bottom: 25px;-->
+<!--        }-->
+
+<!--        .btn-success {-->
+<!--            background-color: #27ae60;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        .btn-success:hover {-->
+<!--            background-color: #219150;-->
+<!--        }-->
+
+<!--        .btn-secondary {-->
+<!--            margin-left: 10px;-->
+<!--        }-->
+
+<!--        label {-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .form-check {-->
+<!--            margin-bottom: 8px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<nav class="navbar navbar-expand-lg navbar-light bg-light">-->
+<!--    <div class="container">-->
+<!--        <span class="navbar-brand">Update Role</span>-->
+
+<!--        <div class="ml-auto">-->
+<!--            <form th:action="@{/logout}" method="post" style="display: inline;">-->
+<!--                <button type="submit" class="btn btn-danger">Logout</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+<!--<body>-->
+<!--<div class="container mt-5">-->
+<!--    <div class="row justify-content-center">-->
+<!--        <div class="col-md-8 form-container">-->
+<!--            <h2 class="text-center">Edit Role</h2>-->
+
+<!--            <form th:action="@{/roles/update}" th:object="${role}" method="post">-->
+<!--                <input type="hidden" th:field="*{idrole}"/>-->
+
+<!--                <div class="mb-3">-->
+<!--                    <label for="nameRole" class="form-label">Role Name</label>-->
+<!--                    <input type="text" th:field="*{nameRole}" id="nameRole" class="form-control" placeholder="Enter role name" required/>-->
+<!--                </div>-->
+
+<!--                <div class="mb-3">-->
+<!--                    <label for="description" class="form-label">Description</label>-->
+<!--                    <textarea th:field="*{description}" id="description" class="form-control" rows="3" placeholder="Enter role description" required></textarea>-->
+<!--                </div>-->
+
+<!--                <div class="mb-3">-->
+<!--                    <label class="form-label">Permissions</label>-->
+<!--                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">-->
+<!--                        <div class="form-check" th:each="perm : ${allPermissions}">-->
+<!--                            <input class="form-check-input" type="checkbox" name="selectedPermissions"-->
+<!--                                   th:value="${perm.idPermission}"-->
+<!--                                   th:checked="${role.permissions.contains(perm)}"-->
+<!--                                   th:id="|perm__${perm.idPermission}|" />-->
+
+<!--                            <label class="form-check-label" th:for="|perm__${perm.idPermission}|"-->
+<!--                                   th:text="${perm.namePermission + ' (' + perm.description + ')'}"></label>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="d-flex justify-content-end mb-3">-->
+<!--                        <a class="btn btn-success" th:href="@{/permissions/createPR}">+ Add Permission</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="d-flex justify-content-end">-->
+<!--                    <button type="submit" class="btn btn-success">Update</button>-->
+<!--                    <a th:href="@{/permissions}" class="btn btn-secondary">Cancel</a>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+
+

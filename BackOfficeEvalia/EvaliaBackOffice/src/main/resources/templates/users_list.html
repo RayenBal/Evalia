@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title th:text="${title}">Liste Utilisateurs - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-users text-gradient"></i> <span th:text="${title}">Liste Utilisateurs</span></h1>
+        <div class="top-bar-actions">
+            <div class="btn-group-modern">
+                <a class="btn-modern btn-outline-modern btn-sm-modern" th:href="@{/adminn/pending-users}">
+                    <i class="fas fa-clock"></i> En attente
+                </a>
+                <a class="btn-modern btn-sm-modern" 
+                   style="background: #10b981; color: white;"
+                   th:href="@{/adminn/approved-users}">
+                    <i class="fas fa-check-circle"></i> Validés
+                </a>
+                <a class="btn-modern btn-outline-modern btn-sm-modern" th:href="@{/adminn/rejected-users}">
+                    <i class="fas fa-times-circle"></i> Rejetés
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" th:text="${#lists.size(users)}">0</div>
+                <div class="stat-label">Total Utilisateurs</div>
+            </div>
+        </div>
+
+        <!-- Alert if empty -->
+        <div th:if="${#lists.isEmpty(users)}" class="alert-modern alert-info">
+            <i class="fas fa-info-circle"></i>
+            Aucun résultat trouvé.
+        </div>
+
+        <!-- Table Card -->
+        <div th:unless="${#lists.isEmpty(users)}" class="card-modern">
+            <div class="card-header-modern">
+                <h2><i class="fas fa-list"></i> Liste des Utilisateurs</h2>
+                <div class="search-bar">
+                    <input type="text" class="form-control-modern" placeholder="Rechercher..." id="searchInput">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th><i class="fas fa-user"></i> Nom</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-tag"></i> Type</th>
+                            <th><i class="fas fa-calendar"></i> Âge</th>
+                            <th><i class="fas fa-check"></i> Vérifié</th>
+                            <th><i class="fas fa-toggle-on"></i> Activé</th>
+                            <th><i class="fas fa-info-circle"></i> Statut</th>
+                            <th><i class="fas fa-file-pdf"></i> Registre</th>
+                            <th><i class="fas fa-clock"></i> Créé le</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr th:each="u, iStat : ${users}">
+                            <td><span class="badge-modern badge-primary" th:text="${iStat.index+1}">1</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;"
+                                         th:text="${#strings.substring(u.firstname, 0, 1)}">U</div>
+                                    <strong th:text="${u.firstname + ' ' + u.lastname}">Nom</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <a th:href="'mailto:'+${u.email}" 
+                                   style="color: #3b82f6; text-decoration: none;" 
+                                   th:text="${u.email}">email</a>
+                            </td>
+                            <td><span class="badge-modern badge-info" th:text="${u.typeUser}">Paneliste</span></td>
+                            <td><span class="badge-modern badge-primary" th:text="${u.ageRange}">26_35</span></td>
+                            <td>
+                                <span th:if="${u.verified}" class="badge-modern badge-success">
+                                    <i class="fas fa-check"></i> Oui
+                                </span>
+                                <span th:unless="${u.verified}" class="badge-modern badge-danger">
+                                    <i class="fas fa-times"></i> Non
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${u.enabled}" class="badge-modern badge-success">
+                                    <i class="fas fa-check"></i> Oui
+                                </span>
+                                <span th:unless="${u.enabled}" class="badge-modern badge-danger">
+                                    <i class="fas fa-times"></i> Non
+                                </span>
+                            </td>
+                            <td>
+                                <span th:switch="${u.status.name()}" class="badge-modern">
+                                    <span th:case="'PENDING'" class="badge-warning">
+                                        <i class="fas fa-clock"></i> EN ATTENTE
+                                    </span>
+                                    <span th:case="'APPROVED'" class="badge-success">
+                                        <i class="fas fa-check"></i> APPROUVÉ
+                                    </span>
+                                    <span th:case="'REJECTED'" class="badge-danger">
+                                        <i class="fas fa-times"></i> REJETÉ
+                                    </span>
+                                    <span th:case="*" th:text="${u.status}">STATUT</span>
+                                </span>
+                            </td>
+                            <td>
+                                <div th:if="${u.registreCommercePath != null}">
+                                    <a th:href="@{/adminn/registre/{id}/download(id=${u.id_user})}"
+                                       class="btn-modern btn-sm-modern"
+                                       style="background: #ef4444; color: white; padding: 6px 12px;"
+                                       title="Télécharger le registre de commerce"
+                                       target="_blank">
+                                        <i class="fas fa-file-pdf"></i> Voir PDF
+                                    </a>
+                                </div>
+                                <div th:unless="${u.typeUser == 'ANNONCEUR' and u.registreCommercePath != null}">
+
+                                </div>
+                            </td>
+                            <td th:text="${#temporals.format(u.createdDate,'dd/MM/yyyy HH:mm')}">01/01/2025</td>
+                            <td>
+                                <div class="table-actions">
+                                    <form th:if="${u.status.name() == 'PENDING'}"
+                                          th:action="@{'/adminn/validate-user/' + ${u.id_user}}" method="post" class="d-inline">
+                                        <button class="btn-modern btn-success-modern btn-sm-modern" title="Valider">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form th:if="${u.status.name() != 'REJECTED'}"
+                                          th:action="@{'/adminn/reject-user/' + ${u.id_user}}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Confirmer le rejet ?');">
+                                        <button class="btn-modern btn-danger-modern btn-sm-modern" title="Rejeter">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#usersTable tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+</body>
+</html>

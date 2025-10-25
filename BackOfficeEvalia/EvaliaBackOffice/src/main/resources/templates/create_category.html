@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer une Catégorie - Evalia BackOffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/admin-modern.css}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="page-with-sidebar fade-in">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-plus-circle text-gradient"></i> Créer une Catégorie</h1>
+        <div class="top-bar-actions">
+            <a class="btn-modern btn-secondary-modern" th:href="@{/categories}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="container-modern">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h2><i class="fas fa-folder-open"></i> Nouvelle Catégorie</h2>
+                        <p class="card-subtitle">Remplissez les informations de la nouvelle catégorie</p>
+                    </div>
+
+                    <form th:action="@{/categories/addCategory}" th:object="${category}" method="post" class="form-modern">
+                        <div class="form-group-modern">
+                            <label for="nameCategory" class="form-label-modern">
+                                <i class="fas fa-tag"></i> Nom de la Catégorie
+                            </label>
+                            <input type="text" 
+                                   id="nameCategory" 
+                                   th:field="*{nameCategory}" 
+                                   class="form-control-modern"
+                                   placeholder="Ex: Électronique, Alimentation, Services..." 
+                                   required>
+                            <div class="form-helper-text">
+                                Choisissez un nom clair et unique pour cette catégorie
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="btn-group-modern" style="justify-content: flex-end;">
+                            <a th:href="@{/categories}" class="btn-modern btn-secondary-modern">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-save"></i> Créer la Catégorie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
